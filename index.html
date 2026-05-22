@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>東海國際有限公司 - 客製加工與設備整合，提供彈性穩定的代工服務</title>
+    
+    <!-- 引入 Tailwind CSS 進行現代化 RWD 視覺設計 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 引入 Lucide Icons 圖標庫 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 網頁基礎字型與平滑滾動樣式 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+
+    <!-- 【關鍵修復】在 Alpine.js 載入前定義全域的 appState 函數 -->
+    <script>
+        function appState() {
+            return {
+                // 實績分類過濾數據
+                categories: ['全部', '零件加工', '設備組裝', '客製化整合', '工廠現場', '包裝出貨'],
+                activeCategory: '全部',
+                
+                portfolioData: [
+                    { id: 1, title: '航空級鋁合金 7075 結構件加工', category: '零件加工', image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80', description: '多角度精密銑削，確保裝配面公差在 ±0.01mm 內，並進行噴砂與本色陽極表面處理。', badge: '研發樣品' },
+                    { id: 2, title: '半導體檢測設備 - 機械手臂機架組裝', category: '設備組裝', image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80', description: '依據客戶 3D 組立圖進行結構組裝、精密水平對齊，並配置氣壓管路與氣壓缸測試。', badge: '設備 OEM' },
+                    { id: 3, title: 'POM 工程塑膠滑塊與不鏽鋼複合治具', category: '零件加工', image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0bc?auto=format&fit=crop&w=800&q=80', description: '解決工程塑膠加工受熱變形問題，保證精密滑軌滑配合順暢無間隙。', badge: '少量多樣' },
+                    { id: 4, title: '客製化不鏽鋼 SUS304 高真空腔體配件', category: '客製化整合', image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80', description: '包含車削、孔位加工、焊接以及表面拋光整合，並通過真空密合度漏氣測試。', badge: '整合加工' },
+                    { id: 5, title: '日常出貨前精密量測與品質檢驗', category: '工廠現場', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', description: '使用二次元與精密游標量器對成品進行檢驗，附帶出貨報告。', badge: '品質堅持' },
+                    { id: 6, title: '安全包裝與木箱固定 - 出貨至竹科園區', category: '包裝出貨', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80', description: '針對精密、易磨損陽極零件進行防刮抗震防靜電多層打包。', badge: '準時交期' }
+                ],
+
+                filteredPortfolio() {
+                    if (this.activeCategory === '全部') return this.portfolioData;
+                    return this.portfolioData.filter(item => item.category === this.activeCategory);
+                },
+
+                // 最新消息數據
+                newsData: [
+                    { id: 1, date: '2026-05-18', title: '新增廠內量測設備：高精度二次元影像量測儀導入，提升檢驗效率與精準度。', tag: '工廠動態', desc: '為了應對日益增加的精密機械零組件需求，我們正式導入了全新影像量測系統，往後將能提供更為詳細的自主檢驗報告。' },
+                    { id: 2, date: '2026-04-30', title: '案例分享：協助某自動化設備商於 5 天內緊急趕製 30 套精密夾治具。', tag: '加工案例', desc: '客戶因急需測試臨時修改設計，東海配合調度產能，提供單一窗口專案排程，順利在客戶預定時程內交付上線。' },
+                    { id: 3, date: '2026-03-12', title: '製程升級：與在地熱處理、陽極處理資深廠家達成深度合作，提升整合加工品質。', tag: '整合資源', desc: '透過長期穩定的上下游結盟，我們優化了硬化處理與各色陽極的排程，能將整體交期縮短 15%~20%。' }
+                ],
+
+                // 常見問題 FAQ
+                faqData: [
+                    { q: '請問你們有最少訂購量（MOQ）的限制嗎？一件也可以加工嗎？', a: '我們非常歡迎少量多樣的訂單！1 件打樣或小量試產，我們都樂意配合。我們了解研發階段或臨時設備零件損壞時的急迫性，提供彈性靈活的接單模式。' },
+                    { q: '我只有 3D 檔（如 STEP/IGS）或只有手繪草圖，這樣可以估價和加工嗎？', a: '可以的！無論您提供的是專業的 CAD 圖面、3D 檔案、甚至是標註了主要尺寸的手繪草圖與實物樣品，我們的工程窗口都會與您核對關鍵公差與功能需求，協助您順利完成零件製作。' },
+                    { q: '請問你們能提供一站式的表面處理（如陽極、熱處理、染黑）服務嗎？', a: '這正是東海的優勢之一。我們協助整合上下游資源，包含熱處理、陽極、化學鎳、硬鉻、染黑、線切割及鈑金。您只需對接我們單一窗口，我們交付給您的就是可以直接裝配的成品，節省您四處找廠與往返運送的隱形成本。' },
+                    { q: '通常詢價多久會回覆？一般零件的交期大約多久？', a: '一般簡單零件在收到完整圖面後，我們會在 24 小時內提供正式報價。常規小量零件加工交期約在 5 到 10 個工作天（視製程複雜度及是否有表面處理而定），若有緊急配合需求，可在評估階段特別告知，我們會盡全力協調生產流程。' }
+                ],
+
+                // ==========================================
+                // 詢價單與估價器 Alpine 狀態 (已接 Web3Forms)
+                // ==========================================
+                quoteForm: {
+                    service: 'CNC 加工 / 零件銑削',
+                    material: '鋁合金 (6061 / 7075)',
+                    qty: '1 ~ 10 件 (打樣/小量)',
+                    hasDrawing: '有 2D 圖紙 & 3D 檔',
+                    surface: '無 (維持切削原色)',
+                    name: '',
+                    contact: ''
+                },
+                submitting: false,
+                quoteSubmitted: false,
+
+                getEstimatedTime() {
+                    let base = "3~5 工作天";
+                    if (this.quoteForm.qty.includes('1 ~ 10')) base = "5~7 工作天";
+                    else if (this.quoteForm.qty.includes('11 ~ 50')) base = "7~10 工作天";
+                    else base = "10~15 工作天";
+                    
+                    if (!this.quoteForm.surface.includes('無')) {
+                        base += " (表面處理 +2~3天)";
+                    }
+                    return base;
+                },
+
+                getEstimatedAdvice() {
+                    let advice = "";
+                    if (this.quoteForm.qty.includes('1 ~ 10')) {
+                        advice = "適合進行快速樣品打樣。建議提供 3D STEP 檔以便加工路徑快速生成。";
+                    } else if (this.quoteForm.qty.includes('11 ~ 50')) {
+                        advice = "適合進行小量試產。本廠可直接代客找料與備料，一條龍完成加工與陽極。";
+                    } else {
+                        advice = "中大批量生產。我們將安排專屬工裝夾具，確保批量尺寸一致性。";
+                    }
+                    return advice;
+                },
+
+                async submitQuote() {
+                    this.submitting = true;
+                    try {
+                        const response = await fetch('https://api.web3forms.com/submit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                access_key: 'e236ffa2-8edc-47a3-a09f-1b5c26691853',
+                                subject: '東海國際 - 網站線上估價需求評估',
+                                from_name: this.quoteForm.name || '網站估價客戶',
+                                "客戶稱呼": this.quoteForm.name,
+                                "聯絡方式": this.quoteForm.contact,
+                                "委託主要項目": this.quoteForm.service,
+                                "預定主要材質": this.quoteForm.material,
+                                "預計數量": this.quoteForm.qty,
+                                "圖面完整度": this.quoteForm.hasDrawing,
+                                "表面熱處理要求": this.quoteForm.surface
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            this.quoteSubmitted = true;
+                            // 重設部分聯絡資料
+                            this.quoteForm.name = '';
+                            this.quoteForm.contact = '';
+                        } else {
+                            alert('抱歉，表單送出失敗。請稍後再試或直接來電。');
+                        }
+                    } catch (error) {
+                        console.error('Error submitting quote:', error);
+                        alert('網路連線異常，請確認網路狀態後重試。');
+                    } finally {
+                        this.submitting = false;
+                    }
+                },
+
+                // ==========================================
+                // 聯絡表單狀態 (已接 Web3Forms)
+                // ==========================================
+                contactForm: {
+                    name: '',
+                    phone: '',
+                    email: '',
+                    message: ''
+                },
+                contactSubmitting: false,
+                contactSubmitted: false,
+
+                async submitContact() {
+                    this.contactSubmitting = true;
+                    try {
+                        const response = await fetch('https://api.web3forms.com/submit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                access_key: 'e236ffa2-8edc-47a3-a09f-1b5c26691853',
+                                subject: '東海國際 - 網站一般聯絡與留言',
+                                from_name: this.contactForm.name,
+                                replyto: this.contactForm.email,
+                                "客戶稱呼": this.contactForm.name,
+                                "聯絡電話": this.contactForm.phone,
+                                "聯絡信箱": this.contactForm.email || '未提供',
+                                "需求說明與留言": this.contactForm.message
+                            })
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            this.contactSubmitted = true;
+                            // 清空表單
+                            this.contactForm = { name: '', phone: '', email: '', message: '' };
+                        } else {
+                            alert('抱歉，留言送出失敗。請稍後再試或直接來電。');
+                        }
+                    } catch (error) {
+                        console.error('Error submitting contact:', error);
+                        alert('網路連線異常，請確認網路狀態後重試。');
+                    } finally {
+                        this.contactSubmitting = false;
+                    }
+                }
+            };
+        }
+    </script>
+
+    <!-- 【關鍵修復】使用 defer 屬性，確保 DOM 載入後且上述的 appState() 解析完畢才運行 Alpine -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen" x-data="appState()">
+
+    <!-- 導覽列 Header -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- Logo -->
+                <a href="#home" class="flex items-center space-x-3 cursor-pointer">
+                    <div class="bg-slate-900 text-amber-500 p-2.5 rounded-lg flex items-center justify-center shadow-md">
+                        <i data-lucide="settings" class="h-6 w-6 text-amber-500"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-wider text-slate-900 block leading-tight">東海國際有限公司</span>
+                        <span class="text-xs text-slate-500 tracking-widest block uppercase">Tung Hai Int'l Corp.</span>
+                    </div>
+                </a>
+
+                <!-- 桌面版選單 -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition duration-150">關於東海</a>
+                    <a href="#services" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition duration-150">服務項目</a>
+                    <a href="#process" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition duration-150">合作方式</a>
+                    <a href="#advantages" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition duration-150">我們的優勢</a>
+                    <a href="#portfolio" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition duration-150">實績案例</a>
+                    <a href="#quote-tool" class="text-sm font-medium text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded hover:bg-amber-100 transition">線上估價諮詢</a>
+                </nav>
+
+                <!-- 聯絡我們 (桌面版) -->
+                <div class="hidden lg:flex items-center">
+                    <a href="#contact" class="bg-slate-900 text-white px-5 py-2.5 rounded-md text-sm font-medium shadow hover:bg-slate-800 hover:shadow-lg transition duration-200 flex items-center space-x-2">
+                        <i data-lucide="phone" class="h-4 w-4"></i>
+                        <span>立即聯絡詢價</span>
+                    </a>
+                </div>
+
+                <!-- 行動版選單按鈕 -->
+                <div class="flex items-center md:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
+                        <i data-lucide="menu" class="h-6 w-6" x-show="!mobileMenuOpen"></i>
+                        <i data-lucide="x" class="h-6 w-6" x-show="mobileMenuOpen" style="display: none;"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 行動版選單內容 -->
+        <div class="md:hidden bg-white border-t border-slate-200 px-4 pt-2 pb-6 space-y-2 shadow-inner" x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" style="display: none;">
+            <a href="#about" @click="mobileMenuOpen = false" class="block w-full text-left px-4 py-2.5 rounded text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">關於東海</a>
+            <a href="#services" @click="mobileMenuOpen = false" class="block w-full text-left px-4 py-2.5 rounded text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">服務項目</a>
+            <a href="#process" @click="mobileMenuOpen = false" class="block w-full text-left px-4 py-2.5 rounded text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">合作方式</a>
+            <a href="#advantages" @click="mobileMenuOpen = false" class="block w-full text-left px-4 py-2.5 rounded text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">我們的優勢</a>
+            <a href="#portfolio" @click="mobileMenuOpen = false" class="block w-full text-left px-4 py-2.5 rounded text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-amber-600">實績案例</a>
+            <a href="#quote-tool" @click="mobileMenuOpen = false" class="block w-full text-center px-4 py-2.5 rounded text-base font-medium text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100">線上估價諮詢</a>
+            <div class="pt-4 border-t border-slate-100 px-4">
+                <a href="#contact" @click="mobileMenuOpen = false" class="w-full bg-slate-900 text-white py-3 rounded text-center font-medium shadow hover:bg-slate-800 transition flex items-center justify-center space-x-2">
+                    <i data-lucide="phone" class="h-4 w-4"></i>
+                    <span>撥打電話/聯絡我們</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative bg-slate-900 text-white overflow-hidden py-16 lg:py-28">
+        
+        <!-- 背景裝飾 -->
+        <div class="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="absolute right-0 bottom-0 w-1/3 h-full bg-gradient-to-l from-slate-800 to-transparent pointer-events-none hidden lg:block"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- 左側標語 -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <div class="inline-flex items-center space-x-2 bg-slate-800 border border-slate-700 rounded-full py-1.5 px-3.5 text-xs font-semibold text-amber-400 tracking-wider">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span>台灣在地精密加工與代工整合廠</span>
+                    </div>
+
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                        客製加工與設備整合，<br />
+                        <span class="text-amber-400">提供彈性穩定的代工服務</span>
+                    </h1>
+
+                    <p class="text-lg text-slate-300 max-w-2xl leading-relaxed">
+                        我們深知研發人員與中小企業的採購痛點。東海不追求誇大與浩大工程，我們專注於<span class="text-white font-semibold">少量多樣、樣品試產、設備客製代工</span>。以迅速、負責的單一對接窗口，做您在生產線上最配合的穩健後盾。
+                    </p>
+
+                    <!-- 優點標籤 -->
+                    <div class="grid grid-cols-2 gap-4 pt-4 text-sm text-slate-300">
+                        <div class="flex items-center space-x-2.5">
+                            <i data-lucide="check-circle" class="h-5 w-5 text-amber-500 flex-shrink-0"></i>
+                            <span>少量多樣、1件亦可承接</span>
+                        </div>
+                        <div class="flex items-center space-x-2.5">
+                            <i data-lucide="check-circle" class="h-5 w-5 text-amber-500 flex-shrink-0"></i>
+                            <span>單一窗口、快速溝通對接</span>
+                        </div>
+                        <div class="flex items-center space-x-2.5">
+                            <i data-lucide="check-circle" class="h-5 w-5 text-amber-500 flex-shrink-0"></i>
+                            <span>代料代購、加工資源整合</span>
+                        </div>
+                        <div class="flex items-center space-x-2.5">
+                            <i data-lucide="check-circle" class="h-5 w-5 text-amber-500 flex-shrink-0"></i>
+                            <span>彈性配合研發快速修改</span>
+                        </div>
+                    </div>
+
+                    <!-- 行動呼籲 -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <a href="#quote-tool" class="bg-amber-500 text-slate-950 font-semibold px-8 py-3.5 rounded-md hover:bg-amber-400 shadow-lg hover:shadow-amber-500/20 transition duration-200 text-center">
+                            填寫報價需求
+                        </a>
+                        <a href="#services" class="bg-slate-800 text-white font-medium border border-slate-700 px-8 py-3.5 rounded-md hover:bg-slate-700 transition duration-200 text-center">
+                            查看服務項目
+                        </a>
+                        <a href="#contact" class="bg-transparent text-slate-300 font-medium px-4 py-3.5 hover:text-white transition duration-200 text-center flex items-center justify-center space-x-1">
+                            <span>聯絡我們</span>
+                            <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- 右側實景照片牆與基本資訊卡片 -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative z-10 rounded-xl overflow-hidden shadow-2xl border border-slate-700 bg-slate-800 p-3">
+                        
+                        <!-- 實景圖 -->
+                        <img 
+                          src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80" 
+                          alt="精密加工零件特寫" 
+                          class="w-full h-64 object-cover rounded-lg shadow-inner"
+                        />
+
+                        <!-- 真實資訊看板 -->
+                        <div class="mt-4 p-4 bg-slate-900 rounded-lg space-y-3 border border-slate-700">
+                            <div class="flex justify-between items-center text-xs text-slate-400 border-b border-slate-800 pb-2">
+                                <span>廠區定位</span>
+                                <span class="text-amber-400 font-mono">精密加工與機構組立廠</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-slate-800 p-2 rounded">
+                                    <span class="block text-amber-400 font-bold text-lg">快速</span>
+                                    <span class="block text-[10px] text-slate-400">24H內回覆</span>
+                                </div>
+                                <div class="bg-slate-800 p-2 rounded">
+                                    <span class="block text-amber-400 font-bold text-lg">彈性</span>
+                                    <span class="block text-[10px] text-slate-400">樣品試產配合</span>
+                                </div>
+                                <div class="bg-slate-800 p-2 rounded">
+                                    <span class="block text-amber-400 font-bold text-lg">整合</span>
+                                    <span class="block text-[10px] text-slate-400">一站式代工</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 text-center italic">「不誇大產能，實事求是，做您最安心的手腳。」</p>
+                        </div>
+
+                    </div>
+
+                    <!-- 背景微光 -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl -z-10"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:items-center lg:space-x-12">
+                
+                <!-- 文字說明 -->
+                <div class="lg:w-1/2 space-y-6">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-950">
+                        我們不是超級大廠，但我們能解決大廠「無法配合的彈性」
+                    </h2>
+                    
+                    <p class="text-slate-600 leading-relaxed text-base">
+                        許多大廠在面對少量多樣、製程頻繁變動、或者圖面尚未定案需要反覆測試修改的產品時，往往因為流程繁瑣或產線規模大而無法靈活配合。
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-slate-900 text-sm">誠信為本，絕不浮誇</h4>
+                            <p class="text-xs text-slate-600 mt-1">不同於大型工廠的制式流程，我們更重視彈性配合與實際需求。
+從客製加工、設備零件到小量生產，我們提供快速溝通、穩定品質與高配合度的製造服務。</p>
+                        </div>
+                        
+                        <div class="bg-slate-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-slate-900 text-sm">單一工程師專案對話</h4>
+                            <p class="text-xs text-slate-600 mt-1">免去大公司的層層公文與業務傳話。您在東海的聯絡窗口，本身即具備讀圖與加工實務經驗，能直接理解您的技術細節，省去大量的溝通成本與出錯率。</p>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-600 leading-relaxed text-sm">
+                        「只要您有加工、組裝、找料或表面處理的需求，不管數量再少，我們都願意與您共同坐下來，從製程討論、報價、首樣生產，到組裝測試。您的託付，東海必竭力達成。」
+                    </p>
+                </div>
+
+                <!-- 右側工廠現場感插圖 -->
+                <div class="lg:w-1/2 mt-10 lg:mt-0 grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80" alt="加工現場實景" class="w-full h-40 object-cover" />
+                        </div>
+                        <div class="bg-slate-100 p-6 rounded-lg text-center border border-slate-200 shadow-sm">
+                            <span class="block text-3xl font-extrabold text-slate-900">100%</span>
+                            <span class="block text-xs text-slate-500 mt-1">圖紙保密協定執行</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-6">
+                        <div class="bg-slate-900 text-white p-6 rounded-lg text-center shadow-lg">
+                            <span class="block text-3xl font-extrabold text-amber-400">客製化</span>
+                            <span class="block text-xs text-slate-300 mt-1">少量可接單</span>
+                        </div>
+                        <div class="rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" alt="精密量測量具" class="w-full h-40 object-cover" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- 段落標題 -->
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">我們的核心服務項目</h2>
+                <div class="h-1 w-20 bg-amber-500 mx-auto"></div>
+                <p class="text-slate-600 text-base">
+                    從單件零件銑削、代工組立，到協助整合熱處理及表面陽極。提供多元而細緻的加工服務。
+                </p>
+            </div>
+
+            <!-- 服務卡片網格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- 卡片 1 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="settings" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">CNC 加工協助</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            提供 3 軸 / 4 軸 CNC 車銑複合精密加工，協助中小企業與研發單位進行打樣與批量生產。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            自動化設備結構件、夾治具、精密配合銷與非標傳動零件。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">少量多樣</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">高精度</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">車銑複合</span>
+                    </div>
+                </div>
+
+                <!-- 卡片 2 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="wrench" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">精密零件製作</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            不論是金屬（鋁合金、不鏽鋼、碳鋼）或工程塑膠（POM、PEEK、鐵氟龍），皆可依圖紙精準加工。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            半導體設備耗材、醫療儀器零組件、測試治具零件。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">多種材質</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">公差控制</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">表面處理整合</span>
+                    </div>
+                </div>
+
+                <!-- 卡片 3 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="cpu" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">設備代工與組裝</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            提供代工組裝（OEM / ODM）服務。從機構件組立、氣路排管到簡單的配線調整，一手包辦。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            專用機組立、包裝設備組裝、學術研究測試機台組裝。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">機構組立</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">氣路排管</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">功能測試</span>
+                    </div>
+                </div>
+
+                <!-- 卡片 4 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="sliders" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">客製化加工代工</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            專門解決特殊規格、非標設計的加工難題。配合客戶工程師共同討論，優化加工可行性。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            實驗室客製外殼、非標準機械結構件、特殊改裝件。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">圖面優化討論</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">1件可接</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">彈性修改</span>
+                    </div>
+                </div>
+
+                <!-- 卡片 5 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="layers" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">代客找料與材料代購</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            省去您與多方材料商溝通的麻煩。我們協助代購特殊鋼材、工程塑膠、標準件及氣動元件。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            一站式購足金屬、塑膠與常用標準件（如 MISUMI、THK 替代件）。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">規格比對</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">代購標準件</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">簡化採購</span>
+                    </div>
+                </div>
+
+                <!-- 卡片 6 -->
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-slate-100 text-slate-900 p-3 rounded-md border border-slate-200">
+                                <i data-lucide="users" class="h-6 w-6 text-slate-800"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">上下游加工整合</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            整合在地優質協力加工鏈，包含熱處理、陽極處理、電鍍、染黑、線切割與雷射鈑金。
+                        </p>
+                        <div class="bg-slate-50 border-l-2 border-slate-400 p-3 rounded text-xs text-slate-700 mb-4">
+                            <strong class="block text-slate-900 mb-0.5">常見應用：</strong>
+                            提供完整的成品交付，不需客戶自行在多個協力廠之間奔波。
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">表面處理</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">熱處理</span>
+                        <span class="bg-slate-100 text-slate-700 text-[11px] px-2 py-0.5 rounded font-medium border border-slate-200">一站式整合</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">透明且敏捷的合作流程</h2>
+                <div class="h-1 w-20 bg-amber-500 mx-auto"></div>
+                <p class="text-slate-600 text-base">
+                    秉持「單一窗口、溝通直接、流程可隨需求調整」原則，讓您的委託加工清晰可控。
+                </p>
+            </div>
+
+            <!-- 流程步驟圖 -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
+                
+                <!-- 步驟 1 -->
+                <div class="relative flex flex-col items-center text-center p-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 text-amber-500 flex items-center justify-center font-bold text-lg mb-4 border-2 border-amber-500 shadow-md">
+                        1
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">需求討論</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        提供圖紙、草圖、樣品或3D檔。由工程師專人與您確認公差、材質、加工細節，並確認裝配需求。
+                    </p>
+                </div>
+
+                <!-- 步驟 2 -->
+                <div class="relative flex flex-col items-center text-center p-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 text-amber-500 flex items-center justify-center font-bold text-lg mb-4 border-2 border-amber-500 shadow-md">
+                        2
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">報價確認</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        24小時內提供包含材質、加工、表面處理、運費在內的清晰透明報價單。價格誠實、絕不浮報。
+                    </p>
+                </div>
+
+                <!-- 步驟 3 -->
+                <div class="relative flex flex-col items-center text-center p-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 text-amber-500 flex items-center justify-center font-bold text-lg mb-4 border-2 border-amber-500 shadow-md">
+                        3
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">加工安排</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        確認接單後，立即安排排程進行加工。針對急件提供高彈性的急件插單協調服務。
+                    </p>
+                </div>
+
+                <!-- 步驟 4 -->
+                <div class="relative flex flex-col items-center text-center p-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 text-amber-500 flex items-center justify-center font-bold text-lg mb-4 border-2 border-amber-500 shadow-md">
+                        4
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">組裝測試</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        若含設備或機構組立，我們將依據設計規格進行冷機組裝、動作測試與公差校準，並拍照回報進度。
+                    </p>
+                </div>
+
+                <!-- 步驟 5 -->
+                <div class="relative flex flex-col items-center text-center p-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-900 text-amber-500 flex items-center justify-center font-bold text-lg mb-4 border-2 border-amber-500 shadow-md">
+                        5
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-2">包裝出貨</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        進行精密量測與表面全檢，附帶出貨報告。採用防震、防碰撞專業包裝，配送至指定地點。
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- 備註小卡片 -->
+            <div class="mt-12 bg-slate-50 border border-slate-200 rounded-lg p-5 flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="p-2 bg-amber-100 rounded-full text-amber-700 flex-shrink-0">
+                        <i data-lucide="clock" class="h-5 w-5"></i>
+                    </div>
+                    <span class="text-sm text-slate-700 font-medium">
+                        我們始終將「穩定長期配合」列為最高指導方針，若對流程有任何特定修改需求，我們均能配合調整。
+                    </span>
+                </div>
+                <a href="#contact" class="text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-400 px-4 py-2.5 rounded shadow transition-colors text-center">
+                    與專案窗口直接對話
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Sourcing Form / Quote Tool -->
+    <section id="quote-tool" class="py-20 bg-slate-900 text-white scroll-mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- 左側說明 -->
+                <div class="lg:col-span-5 space-y-6">
+                    <span class="text-amber-400 font-semibold text-sm tracking-wider uppercase">實體估價、絕不拖延</span>
+                    <h2 class="text-3xl font-extrabold tracking-tight">
+                        快速需求評估系統
+                    </h2>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        想知道您的加工或採購案需要多少時間與何種製程安排？請在右側表單中選擇您的初步構想。
+                    </p>
+                    
+                    <div class="space-y-4 text-xs text-slate-300">
+                        <div class="flex items-start space-x-3 bg-slate-800 p-3 rounded border border-slate-700">
+                            <i data-lucide="check" class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h5 class="font-bold text-white mb-0.5">專業審圖與採購評估</h5>
+                                <span>我們的估價窗口皆具備豐富的加工與採購對接經驗，能快速分析潛在工藝瓶頸，幫您省下不必要的製造成本與流程消耗。</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3 bg-slate-800 p-3 rounded border border-slate-700">
+                            <i data-lucide="check" class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h5 class="font-bold text-white mb-0.5">多重材料配合與供應鏈整合</h5>
+                                <span>我們與各金屬、工程塑膠及標準五金大廠長期合作，選用標準規格原料開工速度最快。</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-slate-400 text-xs">
+                        * 本計算器提供之時間為初步估算，實際報價單與交期仍以本公司核對圖面為準。
+                    </div>
+                </div>
+
+                <!-- 右側評估表單 -->
+                <div class="lg:col-span-7">
+                    <div class="bg-white text-slate-800 rounded-xl p-6 sm:p-8 shadow-2xl border border-slate-200">
+                        
+                        <!-- 送出成功狀態 -->
+                        <div class="text-center py-12 space-y-4" x-show="quoteSubmitted" style="display: none;">
+                            <div class="inline-flex items-center justify-center p-3 bg-green-100 rounded-full text-green-600">
+                                <i data-lucide="check-circle" class="h-10 w-10"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900">感謝您的需求諮詢！</h3>
+                            <p class="text-sm text-slate-600 max-w-md mx-auto">
+                                我們已收到您的加工整合參數，專人（具備製圖及代工背景工程師）將會在工作時間 2~4 小時內與您聯絡。
+                            </p>
+                            <div class="pt-4">
+                                <button @click="quoteSubmitted = false" class="text-xs bg-slate-100 text-slate-800 hover:bg-slate-200 px-4 py-2 rounded transition">
+                                    重新填寫評估
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 填寫狀態 -->
+                        <form @submit.prevent="submitQuote()" x-show="!quoteSubmitted" class="space-y-5">
+                            <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center space-x-2">
+                                <i data-lucide="sliders" class="h-5 w-5 text-amber-500"></i>
+                                <span>線上填寫加工與整合需求</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- 加工項目 -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">委託主要項目</label>
+                                    <select x-model="quoteForm.service" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                                        <option value="CNC 加工 / 零件銑削">CNC 加工 / 零件銑削</option>
+                                        <option value="精密車削 / 配件客製">精密車削 / 配件客製</option>
+                                        <option value="設備組裝代工 (OEM)">設備組裝代工 (OEM)</option>
+                                        <option value="材料採購代購與加工">材料採購代購與加工</option>
+                                        <option value="一站式整合 (表面/熱處理)">一站式整合 (表面/熱處理)</option>
+                                    </select>
+                                </div>
+
+                                <!-- 主要材質 -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">預定主要材質</label>
+                                    <select x-model="quoteForm.material" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                                        <option value="鋁合金 (6061 / 7075)">鋁合金 (6061 / 7075)</option>
+                                        <option value="鋼材 (S50C / 模具鋼)">鋼材 (S50C / 模具鋼)</option>
+                                        <option value="不鏽鋼 (SUS304 / SUS316)">不鏽鋼 (SUS304 / SUS316)</option>
+                                        <option value="工程塑膠 (POM / PEEK)">工程塑膠 (POM / PEEK)</option>
+                                        <option value="不確定 / 需代客推薦">不確定 / 需代客推薦</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <!-- 數量範圍 -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">預計數量</label>
+                                    <select x-model="quoteForm.qty" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                                        <option value="1 ~ 10 件 (打樣/小量)">1 ~ 10 件 (打樣/小量)</option>
+                                        <option value="11 ~ 50 件 (試產)">11 ~ 50 件 (試產)</option>
+                                        <option value="51 ~ 500 件 (批量)">51 ~ 500 件 (批量)</option>
+                                        <option value="500 件以上 (量產)">500 件以上 (量產)</option>
+                                    </select>
+                                </div>
+
+                                <!-- 圖面完整度 -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">是否有完整圖紙</label>
+                                    <select x-model="quoteForm.hasDrawing" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                                        <option value="有 2D 圖紙 & 3D 檔">有 2D 圖紙 & 3D 檔</option>
+                                        <option value="只有 2D 圖 / 只有手繪稿">只有 2D 圖 / 只有手繪稿</option>
+                                        <option value="無圖面 / 需現場測繪">無圖面 / 需現場測繪</option>
+                                    </select>
+                                </div>
+
+                                <!-- 表面處理要求 -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">表面/熱處理要求</label>
+                                    <select x-model="quoteForm.surface" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+                                        <option value="無 (維持切削原色)">無 (維持切削原色)</option>
+                                        <option value="一般陽極 / 導電陽極">一般陽極 / 導電陽極</option>
+                                        <option value="熱處理 (調質/滲碳)">熱處理 (調質/滲碳)</option>
+                                        <option value="電鍍 / 化學鎳 / 染黑">電鍍 / 化學鎳 / 染黑</option>
+                                        <option value="雷射打標 / 其他特殊表面">雷射打標 / 其他特殊表面</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 即時動態排程建議 -->
+                            <div class="bg-amber-50 border border-amber-200 rounded p-4 text-xs text-amber-900 space-y-1">
+                                <div class="flex justify-between font-bold border-b border-amber-100 pb-1">
+                                    <span>💡 東海初步製程預估分析：</span>
+                                    <span class="text-amber-700 font-mono" x-text="'預估交期: ' + getEstimatedTime()">預估交期: 5~7 工作天</span>
+                                </div>
+                                <p class="leading-relaxed" x-text="getEstimatedAdvice()">
+                                    適合進行樣品打樣或快速修改。建議多提供 3D 檔案（STEP）以加速工程師直接對話。
+                                </p>
+                            </div>
+
+                            <!-- 客戶聯絡方式 -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">您的姓名 / 貴司稱呼</label>
+                                    <input type="text" required x-model="quoteForm.name" placeholder="例如：陳經理 / 王工程師" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">聯絡方式 (電話/Email/LINE)</label>
+                                    <input type="text" required x-model="quoteForm.contact" placeholder="例如：0912-345678 / line-id" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none" />
+                                </div>
+                            </div>
+
+                            <button type="submit" :disabled="submitting" class="w-full bg-slate-900 text-white font-semibold py-3 px-4 rounded hover:bg-slate-800 transition duration-150 shadow flex items-center justify-center space-x-2">
+                                <span x-show="submitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                <i data-lucide="send" class="h-4 w-4 text-amber-400" x-show="!submitting"></i>
+                                <span x-text="submitting ? '評估傳送中...' : '送出初步估價評估，與工程師取得聯絡'">送出初步估價評估，與工程師取得聯絡</span>
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Section -->
+    <section id="advantages" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">為什麼我們的客戶選擇長期合作？</h2>
+                <div class="h-1 w-20 bg-amber-500 mx-auto"></div>
+                <p class="text-slate-600 text-sm">
+                    我們不假裝擁有大型精密機台百台。相反地，我們將資源專注於「優質、彈性與絕佳的配合度」。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- 優勢 1 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="sliders" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">真正配合少量與試產需求</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        有些工廠因為批量太小不願接單，或排程漫長。我們專門接「小量、打樣、修模件」。我們甚至協助客戶處理各種加工變動與零件局部微改。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「可配合樣品打樣、研發階段小量測試」
+                    </div>
+                </div>
+
+                <!-- 優勢 2 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="users" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">單一技術窗口，快速對話</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        打電話來不用被轉接好幾次。對接您的專員即是有豐富實戰加工與找料背景的人員，能與您在短時間內理清公差、幾何偏差，避免傳遞盲區。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「直接與技術人員通話，不對牛彈琴」
+                    </div>
+                </div>
+
+                <!-- 優勢 3 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="layers" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">完整整合上下游協力資源</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        不需要再自己分頭找協力。我們處理好陽極、研磨、熱處理、線切割、雷射雕刻等。對接東海，就等同接通了完整的台灣在地機械加工生態網。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「省去您奔波聯絡各家製程的隱性時間成本」
+                    </div>
+                </div>
+
+                <!-- 優勢 4 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="clock" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">誠實回覆，絕不亂延交期</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        有些廠商因排程太擠答應了卻又無限期延遲。我們一旦接單，會對生產進度如實回報。萬一加工有意外狀況，一律誠實提早告知、合力克服問題。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「提供穩定長期配合，以誠信立足市場」
+                    </div>
+                </div>
+
+                <!-- 優勢 5 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="shield" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">嚴格執行品質自主檢驗</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        出廠的每一個尺寸與外觀皆經二次校對、精密分厘卡與二次元等儀器校驗，嚴格剔除毛邊與刮傷。我們拒絕粗製濫造。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「全檢出貨，確保一次組裝成功」
+                    </div>
+                </div>
+
+                <!-- 優勢 6 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 space-y-3 shadow-sm">
+                    <div class="w-10 h-10 rounded bg-slate-950 text-amber-500 flex items-center justify-center">
+                        <i data-lucide="wrench" class="h-5 w-5"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-900">彈性生產安排與流程設計</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        根據您的零件應用需求，我們可以靈活調整粗加工與精加工順序、客製包裝模式，甚至提前儲備專屬材料，優化未來的交期排程。
+                    </p>
+                    <div class="text-amber-700 text-[11px] font-semibold italic">
+                        「協助客戶處理多樣化與特殊加工流程」
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-20 bg-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-12">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">實績與工廠日常展示</h2>
+                <div class="h-1 w-20 bg-amber-500 mx-auto"></div>
+                <p class="text-slate-600 text-sm">
+                    我們不展示過分誇大的高大上案例。此處所呈皆為真實零件製程、出貨包裝與日常量測細節。
+                </p>
+            </div>
+
+            <!-- 分類篩選 Tab (Alpine.js) -->
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <template x-for="cat in categories">
+                    <button
+                        @click="activeCategory = cat"
+                        class="px-4 py-2 text-xs font-semibold rounded-full border transition-all duration-150"
+                        :class="activeCategory === cat ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                        x-text="cat"
+                    ></button>
+                </template>
+            </div>
+
+            <!-- 案例展示網格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="item in filteredPortfolio()" :key="item.id">
+                    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
+                        <!-- 圖片區 -->
+                        <div class="relative h-56 overflow-hidden bg-slate-200">
+                            <img :src="item.image" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <span class="absolute top-3 left-3 bg-slate-900/90 text-amber-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider" x-text="item.badge"></span>
+                        </div>
+
+                        <!-- 內文 -->
+                        <div class="p-5 space-y-2">
+                            <span class="text-xs font-bold text-amber-600 uppercase tracking-widest" x-text="item.category"></span>
+                            <h4 class="text-base font-bold text-slate-900" x-text="item.title"></h4>
+                            <p class="text-xs text-slate-500 leading-relaxed" x-text="item.description"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- News & FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- 左側：最新動態 -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="border-b border-slate-200 pb-4">
+                        <h3 class="text-2xl font-bold text-slate-900">最新消息 & 日常紀錄</h3>
+                        <p class="text-xs text-slate-500 mt-1">東海的最新公告、完成案例與日常分享，實實在在絕不誇飾。</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <template x-for="news in newsData" :key="news.id">
+                            <div class="group border-b border-slate-100 pb-6 last:border-0 last:pb-0">
+                                <div class="flex items-center space-x-2 text-xs text-slate-500 mb-2">
+                                    <i data-lucide="calendar" class="h-3.5 w-3.5"></i>
+                                    <span x-text="news.date"></span>
+                                    <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium" x-text="news.tag"></span>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors" x-text="news.title"></h4>
+                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed" x-text="news.desc"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 右側：常見問題FAQ -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="border-b border-slate-200 pb-4">
+                        <h3 class="text-2xl font-bold text-slate-900">加工採購常見問題解答</h3>
+                        <p class="text-xs text-slate-500 mt-1">針對中小型代工廠與工程師常遇到的痛點問題，我們在此誠實回答。</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <template x-for="(faq, idx) in faqData" :key="idx">
+                            <div class="bg-slate-50 border border-slate-200 rounded p-4 space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <span class="font-bold text-amber-600 text-sm">Q:</span>
+                                    <h4 class="text-sm font-bold text-slate-900" x-text="faq.q"></h4>
+                                </div>
+                                <div class="flex items-start space-x-2 border-t border-slate-100 pt-2 text-xs text-slate-600 leading-relaxed">
+                                    <span class="font-bold text-slate-400">A:</span>
+                                    <p x-text="faq.a"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-slate-100 border-t border-slate-200 scroll-mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">歡迎與東海對接，開展誠信合作</h2>
+                <div class="h-1 w-20 bg-amber-500 mx-auto"></div>
+                <p class="text-slate-600 text-sm">
+                    我們歡迎長期設備委託組立、中高頻零件打樣加工、單次非標客製件與一站式代購材料諮詢。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- 左側：詳細聯絡資訊 -->
+                <div class="lg:col-span-5 bg-slate-900 text-white rounded-lg p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    
+                    <div class="relative z-10 space-y-4">
+                        <h3 class="text-xl font-bold">東海國際有限公司</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            專人窗口快速報價，竭誠歡迎您的來電、LINE 洽詢與工程圖紙交付。我們是您可以放心的穩定加工夥伴。
+                        </p>
+                    </div>
+
+                    <div class="relative z-10 space-y-4 pt-4 border-t border-slate-800 text-sm">
+                        
+                        <!-- 電話 -->
+                        <div class="flex items-start space-x-3.5">
+                            <div class="p-2 bg-slate-800 rounded text-amber-500">
+                                <i data-lucide="phone" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400">服務電話 / 快速聯絡</span>
+                                <span class="block text-base font-bold text-white mt-0.5">0986-537266</span>
+                                <span class="text-xs text-amber-500">週一至週五 08:00 - 17:00 (國定假日休)</span>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="flex items-start space-x-3.5">
+                            <div class="p-2 bg-slate-800 rounded text-amber-500">
+                                <i data-lucide="mail" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400">專案圖紙對接 Email (圖檔接收)</span>
+                                <span class="block text-sm font-bold text-white mt-0.5">
+                                  tunghai12908823@gmail.com
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- LINE 洽詢 -->
+                        <div class="flex items-start space-x-3.5">
+                            <div class="p-2 bg-slate-800 rounded text-amber-500 flex items-center justify-center font-bold text-xs w-8 h-8">
+                                LINE
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400">官方 LINE 線上即時回覆</span>
+                                <span class="block text-sm font-bold text-white mt-0.5">@526vmfhc</span>
+                                <span class="text-[11px] text-green-400">直接加好友傳送草圖或詢問最便利</span>
+                            </div>
+                        </div>
+
+                        <!-- 廠址 -->
+                        <div class="flex items-start space-x-3.5">
+                            <div class="p-2 bg-slate-800 rounded text-amber-500">
+                                <i data-lucide="map-pin" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-xs text-slate-400">辦公地址</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">43641臺中市清水區和睦路三段250號</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 交通說明 -->
+                    <div class="relative z-10 bg-slate-800 rounded overflow-hidden h-32 border border-slate-700 flex items-center justify-center">
+                        <div class="text-center p-3 text-xs text-slate-400 space-y-1">
+                            <i data-lucide="map-pin" class="h-5 w-5 text-amber-500 mx-auto animate-bounce"></i>
+                            <span class="block text-slate-200">交通方便，鄰近神岡/豐原加工聚落</span>
+                            <span class="text-[10px]">歡迎親臨洽談樣品打樣與工藝流程</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 右側：在線留言表單 -->
+                <div class="lg:col-span-7 bg-white rounded-lg p-6 sm:p-8 border border-slate-200 shadow-lg">
+                    
+                    <!-- 留言送出成功狀態 -->
+                    <div class="text-center py-16 space-y-4" x-show="contactSubmitted" style="display: none;">
+                        <div class="inline-flex items-center justify-center p-3 bg-green-100 rounded-full text-green-600">
+                            <i data-lucide="check-circle" class="h-10 w-10"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900">留言表單已成功送出！</h3>
+                        <p class="text-sm text-slate-600">
+                            感謝您的信賴，我們負責對接的工程窗口將在最短時間內回信或與您取得電話聯繫。
+                        </p>
+                        <button @click="contactSubmitted = false" class="mt-4 text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 px-5 py-2.5 rounded transition">
+                            撰寫新訊息
+                        </button>
+                    </div>
+
+                    <!-- 留言表單 -->
+                    <form @submit.prevent="submitContact()" x-show="!contactSubmitted" class="space-y-4">
+                        <h3 class="text-lg font-bold text-slate-900">留言留下您的需求，我們將與您聯繫</h3>
+                        <p class="text-xs text-slate-500">如果您需要快速留言，我們亦會在接到訊息後由專人致電或傳送郵件討論。</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">聯絡人稱呼 / 職稱 *</label>
+                                <input type="text" required x-model="contactForm.name" placeholder="例如：李經理 / 王先生" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">電話 / 手機 *</label>
+                                <input type="text" required x-model="contactForm.phone" placeholder="例如：0912-345-678" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">電子信箱 Email (便於寄送報價單)</label>
+                            <input type="email" x-model="contactForm.email" placeholder="username@company.com" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none" />
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">需求細節說明 / 加工尺寸與數量備註</label>
+                            <textarea rows="4" required x-model="contactForm.message" placeholder="請描述您的加工需求（如：希望加工不鏽鋼銷柱50件、需染黑、或者代工組裝零件...等）。如需精密估價，建議可在本頁估價器填寫或稍後以Email附上圖檔。" class="w-full text-sm bg-slate-50 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <div class="bg-slate-50 rounded p-3 text-xs text-slate-500">
+                            💡 **溫馨提示：** 我們對所有客戶的圖面資料與專利細節，均嚴格執行廠內防洩密制度，絕不向第三方泄露。您可放心委託。
+                        </div>
+
+                        <button type="submit" :disabled="contactSubmitting" class="w-full bg-slate-900 text-white font-semibold py-3 px-4 rounded hover:bg-slate-800 transition shadow flex items-center justify-center space-x-2">
+                            <span x-show="contactSubmitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span x-text="contactSubmitting ? '留言傳送中...' : '送出留言聯絡資訊'">送出留言聯絡資訊</span>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 border-b border-slate-800 pb-8">
+                
+                <!-- 品牌定位 -->
+                <div class="space-y-3">
+                    <span class="text-base font-bold text-white tracking-wider block">東海國際有限公司</span>
+                    <p class="leading-relaxed">
+                        專注中小型加工及設備代工整合，以高品質、強彈性、快回覆提供在地穩定的工程解決方案。
+                    </p>
+                    <div class="text-slate-500">
+                        統編: 87654321 (代)
+                    </div>
+                </div>
+
+                <!-- 核心製程 -->
+                <div class="space-y-3">
+                    <span class="text-sm font-semibold text-white block">核心服務</span>
+                    <ul class="space-y-2">
+                        <li><a href="#services" class="hover:text-amber-500 text-left">CNC車銑精密加工</a></li>
+                        <li><a href="#services" class="hover:text-amber-500 text-left">自動化設備代工組立</a></li>
+                        <li><a href="#services" class="hover:text-amber-500 text-left">客製化治具與零件製作</a></li>
+                        <li><a href="#services" class="hover:text-amber-500 text-left">金屬工程塑膠材料代購</a></li>
+                    </ul>
+                </div>
+
+                <!-- 客戶價值 -->
+                <div class="space-y-3">
+                    <span class="text-sm font-semibold text-white block">企業承諾</span>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2">
+                            <i data-lucide="check" class="h-3 w-3 text-amber-500"></i>
+                            <span>1 件起即可承接加工</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i data-lucide="check" class="h-3 w-3 text-amber-500"></i>
+                            <span>出貨皆提供精密尺寸報告</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i data-lucide="check" class="h-3 w-3 text-amber-500"></i>
+                            <span>與客戶簽署NDA保密協定</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i data-lucide="check" class="h-3 w-3 text-amber-500"></i>
+                            <span>彈性配合研發期反覆修改</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 快速對接 -->
+                <div class="space-y-3">
+                    <span class="text-sm font-semibold text-white block">專案快速通道</span>
+                    <p>如有緊急打樣或修改案，請直接與負責窗口聯絡：</p>
+                    <a href="#quote-tool" class="inline-flex items-center space-x-2 bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded hover:bg-amber-400 transition">
+                        <span>需求線上快速發送</span>
+                        <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- 底版版權與宣告 -->
+            <div class="flex flex-col sm:flex-row justify-between items-center text-slate-500 space-y-4 sm:space-y-0">
+                <div>
+                    &copy; 2026 東海國際有限公司 Tung Hai Int'l Corp.. All Rights Reserved. 
+                </div>
+                <div class="flex space-x-4">
+                    <span class="hover:text-slate-400 cursor-pointer">隱私權保護政策</span>
+                    <span>|</span>
+                    <span class="hover:text-slate-400 cursor-pointer">加工技術保密聲明</span>
+                    <span>|</span>
+                    <a href="https://unsplash.com" target="_blank" rel="noreferrer" class="hover:text-slate-400 inline-flex items-center space-x-1">
+                        <span>實景圖庫來源說明</span>
+                        <i data-lucide="external-link" class="h-3 w-3 ml-0.5"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- 初始化 Lucide 圖標 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
