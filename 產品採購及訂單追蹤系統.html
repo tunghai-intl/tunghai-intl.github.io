@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供應商與產品採購及訂單追蹤系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 SheetJS 用於 Excel 匯出 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-[1600px] mx-auto"> <!-- 加寬主容器 -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">供應商與產品採購及訂單追蹤系統 </h1>
+                <p class="text-gray-500">小型公司  | 詢價狀態管理升級版</p>
+            </div>
+            <div class="flex flex-col gap-2 align-end">
+                <!-- 原有 JSON 備份區 -->
+                <div class="bg-white p-2 rounded shadow-sm border flex gap-2 items-center justify-end">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">System JSON</span>
+                    <button onclick="exportData()" class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">備份全部</button>
+                    <label class="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 cursor-pointer">
+                        還原 <input type="file" id="importFile" class="hidden" onchange="importData(event)">
+                    </label>
+                    <button onclick="clearData()" class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">清除資料</button>
+                </div>
+                <!-- 時間戳顯示區 -->
+                <div class="bg-white p-2 rounded shadow-sm border flex gap-4 items-center text-xs text-gray-600">
+                    <div>最近匯出：<span id="lastExportTime">-</span></div>
+                    <div>最近匯入：<span id="lastImportTime">-</span></div>
+                </div>
+                <!-- Excel 操作區 -->
+                <div class="bg-white p-2 rounded shadow-sm border flex flex-wrap gap-2 items-center">
+                    <span class="text-xs font-bold text-green-600 uppercase tracking-wider">Excel .xlsx</span>
+                    <div class="flex gap-1">
+                        <button onclick="exportToExcel('suppliers')" class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded hover:bg-green-200 border border-green-200">匯出廠商</button>
+                        <button onclick="exportToExcel('products')" class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded hover:bg-green-200 border border-green-200">匯出產品</button>
+                        <button onclick="exportToExcel('orders')" class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded hover:bg-green-200 border border-green-200">匯出訂單明細</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 頁籤導覽 -->
+        <nav class="flex space-x-2 md:space-x-8 border-b border-gray-200 mb-6 overflow-x-auto pb-1">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn py-2 px-1 font-medium tab-active shrink-0 transition-colors">概況</button>
+            <button onclick="switchTab('suppliers')" id="tab-suppliers" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">供應商管理</button>
+            <button onclick="switchTab('products')" id="tab-products" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">產品報價查詢</button>
+            
+            <button onclick="switchTab('client-quotes')" id="tab-client-quotes" class="tab-btn py-2 px-1 font-medium text-purple-600 hover:text-purple-700 shrink-0 flex items-center transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                客戶報價
+            </button>
+            <button onclick="switchTab('supplier-inquiries')" id="tab-supplier-inquiries" class="tab-btn py-2 px-1 font-medium text-indigo-600 hover:text-indigo-700 shrink-0 flex items-center transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                供應商詢價
+            </button>
+            
+            <button onclick="switchTab('purchase')" id="tab-purchase" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 flex items-center transition-colors">
+                採購單管理 <span id="cartCount" class="ml-1 bg-red-500 text-white text-xs px-1.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">訂單追蹤</button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">庫存管理</button>
+            <button onclick="switchTab('shipping')" id="tab-shipping" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">出貨</button>
+            <button onclick="switchTab('add')" id="tab-add" class="tab-btn py-2 px-1 font-medium text-gray-500 hover:text-gray-700 shrink-0 transition-colors">+ 新增資料</button>
+        </nav>
+
+        <!-- 儀表概況頁面 -->
+        <section id="page-dashboard" class="page-content">
+            <div class="flex flex-col gap-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">系統概況</h2>
+                    <p class="text-sm text-gray-500">快速檢視目前供應商、產品、報價、詢價、採購與訂單進度。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card p-4 border-l-4 border-blue-500">
+                        <div class="text-sm text-gray-500">供應商總數</div>
+                        <div id="dashboardSupplierCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-teal-500">
+                        <div class="text-sm text-gray-500">產品總數</div>
+                        <div id="dashboardProductCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-purple-500">
+                        <div class="text-sm text-gray-500">客戶報價單</div>
+                        <div id="dashboardQuoteCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card p-4 border-l-4 border-indigo-500">
+                        <div class="text-sm text-gray-500">進行中採購項目</div>
+                        <div id="dashboardCartCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-yellow-500">
+                        <div class="text-sm text-gray-500">訂單總數</div>
+                        <div id="dashboardOrderCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                    <div class="card p-4 border-l-4 border-pink-500">
+                        <div class="text-sm text-gray-500">詢價單總數</div>
+                        <div id="dashboardInquiryCount" class="text-3xl font-bold text-gray-800">0</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="card p-4">
+                        <h3 class="text-base font-semibold text-gray-800 mb-3">報價單狀態</h3>
+                        <div id="dashboardQuoteStatus" class="space-y-2 text-sm text-gray-600"></div>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="text-base font-semibold text-gray-800 mb-3">詢價單狀態</h3>
+                        <div id="dashboardInquiryStatus" class="space-y-2 text-sm text-gray-600"></div>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="text-base font-semibold text-gray-800 mb-3">付款狀態</h3>
+                        <div id="dashboardPaymentStatus" class="space-y-2 text-sm text-gray-600"></div>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="text-base font-semibold text-gray-800 mb-3">物流狀態</h3>
+                        <div id="dashboardLogisticsStatus" class="space-y-2 text-sm text-gray-600"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 供應商清單頁面 -->
+        <section id="page-suppliers" class="page-content hidden">
+            <div class="mb-4 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div class="flex-1">
+                    <input type="text" id="searchSupplier" placeholder="搜尋供應商名稱、統編、聯絡人或地址..." 
+                        class="w-full p-3 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                        oninput="renderSuppliers()">
+                </div>
+                <button onclick="openModal('modal-quick-add-supplier')" class="px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 flex items-center gap-2 whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    快速新增供應商
+                </button>
+            </div>
+            <div id="supplierList" class="space-y-2">
+                <!-- 供應商列表動態渲染 -->
+            </div>
+            <p class="text-xs text-gray-400 mt-2 text-center">點擊供應商列可展開詳細資訊與操作按鈕</p>
+        </section>
+
+        <!-- 產品清單頁面 -->
+        <section id="page-products" class="page-content hidden">
+            <div class="mb-4 flex flex-col md:flex-row gap-4">
+                <input type="text" id="searchProduct" placeholder="搜尋產品名稱、規格或供應商..." 
+                    class="flex-1 p-3 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    oninput="renderProducts()">
+            </div>
+            <div class="overflow-x-auto card">
+                <table class="w-full text-left whitespace-nowrap md:whitespace-normal">
+                    <thead class="bg-gray-50 border-b text-gray-600">
+                        <tr>
+                            <th class="p-4">產品名稱/規格</th>
+                            <th class="p-4">供應商</th>
+                            <th class="p-4">預計交期</th>
+                            <th class="p-4">單價</th>
+                            <th class="p-4">含稅</th>
+                            <th class="p-4">運費</th>
+                            <th class="p-4">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList" class="text-sm">
+                        <!-- 產品列動態渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 客戶報價頁面 -->
+        <section id="page-client-quotes" class="page-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">客戶報價單管理 (給客戶)</h2>
+                    <p class="text-sm text-gray-500">建立給客戶的報價單，追蹤報價狀態，成交可轉採購。</p>
+                </div>
+                <button onclick="openCreateQuoteModal()" class="px-4 py-2 bg-purple-600 text-white rounded font-bold hover:bg-purple-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    建立新報價單
+                </button>
+            </div>
+
+            <div class="bg-white p-4 rounded shadow-sm border mb-4 flex flex-col lg:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">搜尋客戶或單號 (QT...)</label>
+                    <input type="text" id="searchQuoteKeyword" placeholder="輸入關鍵字..." 
+                        class="w-full p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none"
+                        oninput="renderClientQuotes()">
+                </div>
+                <div class="w-full lg:w-48">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">狀態篩選</label>
+                    <select id="filterQuoteStatus" class="w-full p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none" onchange="renderClientQuotes()">
+                        <option value="all">全部狀態</option>
+                        <option value="open">處理中 (New)</option>
+                        <option value="quoted">已報價</option>
+                        <option value="waiting">等回應</option>
+                        <option value="lost">未成交</option>
+                        <option value="converted">已成交/轉採購</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 w-full lg:w-auto">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">日期起</label>
+                        <input type="date" id="filterQuoteStart" class="p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none" onchange="renderClientQuotes()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">日期訖</label>
+                        <input type="date" id="filterQuoteEnd" class="p-2 border rounded focus:ring-2 focus:ring-purple-500 outline-none" onchange="renderClientQuotes()">
+                    </div>
+                </div>
+            </div>
+
+            <div id="clientQuoteList" class="space-y-4">
+                <!-- 報價單列表動態渲染 -->
+            </div>
+        </section>
+
+        <!-- 供應商詢價頁面 (v11.5 狀態管理升級) -->
+        <section id="page-supplier-inquiries" class="page-content hidden">
+             <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">供應商詢價單管理 (對廠商)</h2>
+                    <p class="text-sm text-gray-500">紀錄向廠商詢問的新產品，確認有貨後可轉為正式產品資料。</p>
+                </div>
+                <button onclick="openCreateInquiryModal()" class="px-4 py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    建立新詢價單
+                </button>
+            </div>
+            
+            <!-- v11.4 新增詢價單搜尋, v11.5 新增狀態篩選 -->
+            <div class="mb-4 bg-white p-3 rounded shadow-sm border flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">搜尋詢價紀錄</label>
+                    <input type="text" id="searchInquiryKeyword" placeholder="輸入廠商名稱、產品名稱、備註或單號..." 
+                        class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500 outline-none"
+                        oninput="renderSupplierInquiries()">
+                </div>
+                <div class="w-full md:w-48">
+                    <label class="block text-xs font-bold text-gray-500 mb-1">詢價狀態</label>
+                    <select id="filterInquiryStatus" class="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500 outline-none" onchange="renderSupplierInquiries()">
+                        <option value="all">全部狀態</option>
+                        <option value="waiting">等回覆</option>
+                        <option value="replied">已回覆</option>
+                        <option value="price_high">價格高</option>
+                        <option value="no_stock">無供貨</option>
+                        <option value="converted">已轉正式產品</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="supplierInquiryList" class="space-y-4">
+                <!-- 詢價單列表動態渲染 -->
+            </div>
+        </section>
+
+        <!-- 採購單管理頁面 -->
+        <section id="page-purchase" class="page-content hidden">
+            <div class="card p-6">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-800">當前採購清單</h2>
+                        <p class="text-sm text-gray-500">請勾選要下單的項目，系統將<span class="text-red-600 font-bold">僅計算勾選項目</span>的金額。</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="clearCart()" class="text-sm text-red-500 hover:underline border border-red-200 px-3 py-1 rounded">清空清單</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left min-w-[950px]">
+                        <thead class="bg-blue-50 border-b text-blue-800">
+                            <tr>
+                                <th class="p-3 w-10 text-center">
+                                    <input type="checkbox" id="selectAllCart" onchange="toggleSelectAllCart(this)">
+                                </th>
+                                <th class="p-3 w-1/5">產品資訊</th>
+                                <th class="p-3 w-1/6">單價 (可修改)</th>
+                                <th class="p-3 w-20">數量</th>
+                                <th class="p-3 w-32">稅別</th>
+                                <th class="p-3 w-20">運費</th>
+                                <th class="p-3 w-1/6">備註</th>
+                                <th class="p-3 w-24 text-right">小計</th>
+                                <th class="p-3 w-20 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartList" class="divide-y text-sm">
+                            <!-- 採購項目渲染 -->
+                        </tbody>
+                        <tfoot class="bg-gray-50 font-bold border-t-2 border-gray-200 text-gray-700">
+                            <tr>
+                                <td colspan="7" class="p-2 text-right text-gray-500">項目小計 (Subtotal)</td>
+                                <td colspan="2" class="p-2 text-right">$<span id="cartSubtotal">0</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="p-2 text-right text-gray-500">稅額 (5% VAT)</td>
+                                <td colspan="2" class="p-2 text-right text-red-600">+$<span id="cartTax">0</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="p-2 text-right text-gray-500">運費 (Shipping)</td>
+                                <td colspan="2" class="p-2 text-right">+$<span id="cartShipping">0</span></td>
+                            </tr>
+                            <tr class="bg-blue-100 border-t border-blue-200 text-blue-900">
+                                <td colspan="6" class="p-4 text-right">
+                                    已選取 <span id="selectedCount" class="font-bold text-blue-600 text-lg">0</span> 筆
+                                </td>
+                                <td class="p-4 text-right">總金額 (Total):</td>
+                                <td colspan="2" class="p-4 text-right text-2xl font-bold">$<span id="cartTotal">0</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="mt-6 flex flex-col md:flex-row justify-end gap-3 items-center">
+                    <button onclick="exportCartToExcel()" class="px-6 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 transition flex items-center gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        匯出 Excel
+                    </button>
+                    <button onclick="confirmOrder()" class="px-6 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 shadow-lg transition transform hover:-translate-y-0.5">
+                        下單已選項目 (建立訂單)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 訂單追蹤頁面 (v11.1 升級: 物流狀態細緻化, v11.3: 稅務邏輯與付款日) -->
+        <section id="page-orders" class="page-content hidden">
+            <div class="mb-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">歷史訂單與交期追蹤</h2>
+                    <button onclick="exportInvoiceExcel()" class="mt-2 md:mt-0 px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        匯出發票明細 (Excel)
+                    </button>
+                </div>
+                
+                <!-- 搜尋與篩選區塊 -->
+                <div class="flex flex-col md:flex-row gap-4 bg-white p-4 rounded shadow-sm border">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">搜尋產品/供應商/發票/原始單號</label>
+                        <input type="text" id="searchOrderKeyword" placeholder="輸入關鍵字..." 
+                            class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                            oninput="renderOrders()">
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <div class="w-full md:w-36">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">下單年</label>
+                            <select id="filterOrderYear" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderOrders()">
+                                <option value="all">全部年份</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-32">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">下單月</label>
+                            <select id="filterOrderMonth" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderOrders()">
+                                <option value="all">全部月份</option>
+                                <option value="01">01 月</option>
+                                <option value="02">02 月</option>
+                                <option value="03">03 月</option>
+                                <option value="04">04 月</option>
+                                <option value="05">05 月</option>
+                                <option value="06">06 月</option>
+                                <option value="07">07 月</option>
+                                <option value="08">08 月</option>
+                                <option value="09">09 月</option>
+                                <option value="10">10 月</option>
+                                <option value="11">11 月</option>
+                                <option value="12">12 月</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-40">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">付款狀態</label>
+                            <select id="filterPaymentStatus" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderOrders()">
+                                <option value="all">全部付款狀態</option>
+                                <option value="paid">已付款</option>
+                                <option value="unpaid">未付款</option>
+                                <option value="monthly">月結</option>
+                                <option value="刷卡">刷卡</option>
+                                <option value="匯款">匯款</option>
+                                <option value="現金">現金</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-40">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">物流狀態 (升級)</label>
+                            <select id="filterOrderStatus" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderOrders()">
+                                <option value="all">全部物流狀態</option>
+                                <option value="ordered">已下單</option>
+                                <option value="partial_shipped">部分出貨</option>
+                                <option value="shipped">全部出貨</option>
+                                <option value="arrived">已收貨</option>
+                                <option value="completed">已驗收完成</option>
+                                <option value="cancelled">已取消(退)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="orderList" class="space-y-6">
+                <!-- 訂單區塊動態渲染 -->
+            </div>
+        </section>
+
+        <!-- 庫存管理頁面 -->
+        <section id="page-inventory" class="page-content hidden">
+            <div class="mb-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">庫存管理與轉入記錄</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportToExcel('inventory')" class="mt-2 md:mt-0 px-4 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 flex items-center gap-2">
+                            匯出庫存清單
+                        </button>
+                        <button onclick="exportToExcel('inventoryMovements')" class="mt-2 md:mt-0 px-4 py-2 bg-emerald-600 text-white rounded font-bold hover:bg-emerald-700 flex items-center gap-2">
+                            匯出轉入記錄
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-4 bg-white p-4 rounded shadow-sm border">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">搜尋庫存 / 訂單編號 / 產品</label>
+                        <input id="searchInventoryKeyword" type="text" placeholder="輸入關鍵字..." class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" oninput="renderInventory()">
+                    </div>
+                    <div class="w-full md:w-48">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">庫存狀態</label>
+                        <select id="filterInventoryStatus" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderInventory()">
+                            <option value="all">全部狀態</option>
+                            <option value="正常">正常</option>
+                            <option value="低庫存">低庫存</option>
+                            <option value="缺貨">缺貨</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 bg-white p-4 rounded shadow-sm border">
+                    <div class="text-sm font-bold text-gray-700 mb-3">統一庫存操作區</div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-500">庫存編號</label>
+                            <input id="inventoryActionId" type="text" placeholder="請輸入庫存編號" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="lg:col-span-2 flex flex-wrap gap-2 items-end">
+                            <button type="button" onclick="openInventoryBatchesByInput()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">批次追蹤</button>
+                            <button type="button" onclick="openInventoryShippingModalByInput()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">出貨</button>
+                            <button type="button" onclick="openInventoryAdjustModalByInput()" class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">盤點調整</button>
+                            <button type="button" onclick="openInventorySplitModalByInput()" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">拆分包裝</button>
+                            <button type="button" onclick="openDeleteInventoryConfirmModalByInput()" class="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800">刪除庫存</button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-3">請輸入欲操作的庫存編號，然後選擇對應功能。</div>
+                </div>
+            </div>
+            <div id="inventoryList" class="space-y-6"></div>
+        </section>
+
+        <section id="page-shipping" class="page-content hidden">
+            <div class="mb-4">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">出貨紀錄</h2>
+                        <p class="text-sm text-gray-500">記錄出貨扣庫存，並可搜尋庫存 / 訂單編號 / 產品、選擇日期範圍。</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportOutboundRecords()" class="mt-2 md:mt-0 px-4 py-2 bg-emerald-600 text-white rounded font-bold hover:bg-emerald-700 flex items-center gap-2">
+                            匯出出貨記錄
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-4 bg-white p-4 rounded shadow-sm border">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">搜尋庫存 / 訂單編號 / 產品</label>
+                        <input id="searchShippingKeyword" type="text" placeholder="輸入關鍵字..." class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" oninput="renderShipping()">
+                    </div>
+                    <div class="w-full md:w-40">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">起始日期</label>
+                        <input id="filterShippingStartDate" type="date" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderShipping()">
+                    </div>
+                    <div class="w-full md:w-40">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">結束日期</label>
+                        <input id="filterShippingEndDate" type="date" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderShipping()">
+                    </div>
+                </div>
+            </div>
+            <div id="shippingList" class="space-y-6"></div>
+        </section>
+
+        <!-- 新增資料表單 -->
+        <section id="page-add" class="page-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 供應商表單 -->
+                <div class="card p-6 border-t-4 border-blue-500">
+                    <h2 class="text-xl font-bold mb-4 text-blue-700">錄入供應商資料</h2>
+                    <form id="supplierForm" class="space-y-4 max-w-4xl mx-auto">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">供應商名稱 *</label>
+                            <input type="text" name="name" required class="w-full p-2 border rounded bg-gray-50">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">聯絡人</label>
+                                <input type="text" name="contact" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">聯絡人電話</label>
+                                <input type="text" name="phone" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">公司統編</label>
+                                <input type="text" name="taxId" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">公司電話</label>
+                                <input type="text" name="companyPhone" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">付款方式</label>
+                                <select name="paymentType" onchange="toggleMonthlyDays(this, 'monthlyDaysWrapper')" class="w-full p-2 border rounded bg-gray-50">
+                                    <option value="現金">現金</option>
+                                    <option value="匯款">匯款</option>
+                                    <option value="信用卡">信用卡</option>
+                                    <option value="月結">月結</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="monthlyDaysWrapper" style="display:none;">
+                            <label class="block text-sm font-medium mb-1">月結天數</label>
+                            <input type="number" name="monthlyDays" class="w-full p-2 border rounded bg-gray-50" placeholder="例如 30">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">匯款帳號</label>
+                            <input type="text" name="remittanceAccount" class="w-full p-2 border rounded bg-gray-50" placeholder="請輸入匯款帳號">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">網址</label>
+                            <input type="url" name="website" placeholder="https://" class="w-full p-2 border rounded bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">供貨地址</label>
+                            <input type="text" name="address" class="w-full p-2 border rounded bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">備註</label>
+                            <textarea name="note" rows="2" class="w-full p-2 border rounded bg-gray-50"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition">儲存供應商</button>
+                    </form>
+                </div>
+
+                <!-- 產品報價表單 -->
+                <div class="card p-6 border-t-4 border-orange-500">
+                    <h2 class="text-xl font-bold mb-4 text-orange-700">錄入產品報價</h2>
+                    <form id="productForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">對應供應商 *</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="supplierSearchInput" list="supplierListForProduct" required class="flex-1 p-2 border rounded bg-gray-50 focus:bg-white" placeholder="輸入供應商名稱搜尋...">
+                                <input type="hidden" id="supplierId" name="supplierId" required>
+                                <datalist id="supplierListForProduct">
+                                    <!-- 動態填入供應商選項 -->
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">產品名稱 *</label>
+                                <input type="text" name="prodName" required class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium mb-1">品牌名稱</label>
+                                <input type="text" name="brandName" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">規格</label>
+                            <input type="text" name="spec" class="w-full p-2 border rounded bg-gray-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">產品網址 (供參考)</label>
+                            <input type="url" name="prodUrl" placeholder="https://" class="w-full p-2 border rounded bg-gray-50">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">單價</label>
+                                <input type="number" name="price" step="0.01" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">稅務</label>
+                                <select name="isTaxIncl" class="w-full p-2 border rounded bg-gray-50">
+                                    <option value="含稅">含稅</option>
+                                    <option value="不含稅">不含稅</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">參考運費</label>
+                                <input type="number" name="shipping" value="0" class="w-full p-2 border rounded bg-gray-50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">產品備註</label>
+                            <textarea name="prodNote" rows="2" class="w-full p-2 border rounded bg-gray-50"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2 bg-orange-600 text-white rounded font-bold hover:bg-orange-700 transition">儲存產品報價</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal: 建立/修改 客戶報價單 (v11.1 加寬版 max-w-7xl) -->
+    <div id="modal-create-quote" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-7xl p-6 mx-4 max-h-[95vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4 text-purple-700" id="quoteModalTitle">建立客戶報價單</h2>
+            <div class="bg-purple-50 p-2 mb-2 rounded border border-purple-200 text-xs text-purple-800">
+                系統將自動生成單號格式：QT + 民國年(3碼) + 月(2碼) + 日(2碼) + 流水號(2碼)。例如：QT115021301
+            </div>
+            <input type="hidden" id="quoteId">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">客戶名稱 *</label>
+                    <input type="text" id="quoteClientName" class="w-full p-2 border rounded" placeholder="輸入客戶名稱">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">報價日期</label>
+                    <input type="date" id="quoteDate" class="w-full p-2 border rounded" value="">
+                </div>
+                <div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">付款方式</label>
+                        <select name="paymentType" onchange="toggleMonthlyDays(this, 'quoteMonthlyDaysWrapper')" 
+                            class="w-full p-2 border rounded">
+                            <option value="現金">現金</option>
+                            <option value="匯款">匯款</option>
+                            <option value="月結">月結</option>
+                        </select>
+                    </div>
+                    <div id="quoteMonthlyDaysWrapper" style="display:none;">
+                        <label class="block text-sm font-medium mb-1">月結天數</label>
+                        <input type="number" name="monthlyDays" class="w-full p-2 border rounded" placeholder="例如 30">
+                    </div>
+                     <label class="block text-sm font-medium mb-1">備註</label>
+                     <input type="text" id="quoteNote" class="w-full p-2 border rounded" placeholder="例如: 專案A">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">狀態</label>
+                    <select id="quoteStatus" class="w-full p-2 border rounded bg-gray-50" onchange="toggleLossReason()">
+                        <option value="open">處理中 (New)</option>
+                        <option value="quoted">已報價</option>
+                        <option value="waiting">等回應</option>
+                        <option value="lost">未成交</option>
+                        <option value="converted">已成交/轉採購</option>
+                    </select>
+                </div>
+            </div>
+            <div id="lossReasonDiv" class="mb-4 hidden">
+                <label class="block text-sm font-medium mb-1 text-red-600">未成交原因 *</label>
+                <input type="text" id="quoteLossReason" class="w-full p-2 border rounded border-red-200 bg-red-50" placeholder="例如: 價格太高、交期太久...">
+            </div>
+            
+            <div class="flex flex-col gap-4 border-t pt-4 pr-2">
+                <!-- 直式：先選擇產品，再顯示報價內容與毛利分析 -->
+                <div class="w-full flex flex-col mb-2">
+                    <h3 class="font-bold text-gray-700 mb-2">1. 選擇產品</h3>
+                    <input type="text" id="quoteSearchProduct" placeholder="請輸入關鍵字以篩選產品 (至少 2 字)" class="w-full p-2 border rounded mb-2" oninput="renderQuoteProductSelection()">
+                    <div id="quoteProductList" class="max-h-52 overflow-y-auto custom-scroll space-y-2 pr-2">
+                        <!-- 產品清單會在輸入篩選後顯示 -->
+                    </div>
+                </div>
+                <div class="w-full flex flex-col">
+                    <div class="flex justify-between items-center mb-2">
+                         <h3 class="font-bold text-gray-700">2. 報價內容與毛利分析</h3>
+                         <span class="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                             即時計算毛利%
+                         </span>
+                    </div>
+                   
+                    <div class="mb-2 text-xs text-gray-500 bg-yellow-50 p-2 rounded border border-yellow-200 flex justify-between items-center">
+                        <span><span class="font-bold text-yellow-700">提示：</span> 修改「報價金額」會即時更新右側毛利。</span>
+                    </div>
+
+                    <div id="quoteSelectedList" class="flex-1 overflow-y-auto custom-scroll bg-gray-50 p-2 rounded border space-y-2">
+                        <p class="text-gray-400 text-center mt-10">尚未選擇產品</p>
+                    </div>
+                    
+                    <!-- 毛利總結區塊 -->
+                    <div id="quoteProfitSummary" class="mt-2 bg-gray-800 text-white p-3 rounded flex justify-between items-center shadow">
+                        <div class="text-sm">
+                            <div>總成本: <span id="summaryTotalCost" class="font-mono text-gray-300">$0</span></div>
+                            <div>總營收: <span id="summaryTotalSales" class="font-mono text-yellow-300 font-bold">$0</span></div>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-xs text-gray-400">預估毛利額</div>
+                             <div id="summaryProfitVal" class="font-bold text-lg">$0</div>
+                        </div>
+                         <div class="text-right pl-4 border-l border-gray-600">
+                             <div class="text-xs text-gray-400">毛利率 %</div>
+                             <div id="summaryMarginVal" class="font-bold text-2xl text-green-400">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-4 border-t mt-4">
+                <button onclick="saveClientQuote()" class="flex-1 py-2 bg-purple-600 text-white rounded font-bold hover:bg-purple-700">儲存報價單</button>
+                <button onclick="closeModal('modal-create-quote')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded font-bold hover:bg-gray-300">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 建立/修改 供應商詢價單 (v11.5 新增狀態) -->
+    <div id="modal-create-inquiry" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-3xl p-6 mx-4">
+            <h2 id="inquiryModalTitle" class="text-xl font-bold mb-4 text-indigo-700">建立供應商詢價單 (新產品)</h2>
+            <input type="hidden" id="inquiryId">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">詢價對象 (選擇現有供應商) *</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inquirySupplierName" list="supplierListOptions" class="flex-1 p-2 border rounded bg-gray-50 focus:bg-white" placeholder="輸入名稱搜尋或點擊右側新增">
+                        <datalist id="supplierListOptions">
+                            <!-- 動態填入供應商選項 -->
+                        </datalist>
+                        <button type="button" onclick="openQuickAddSupplier()" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm whitespace-nowrap" title="建立新供應商">
+                            + 建立
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">詢價日期</label>
+                    <input type="date" id="inquiryDate" class="w-full p-2 border rounded" value="">
+                </div>
+            </div>
+
+             <!-- v11.5 新增：狀態選擇 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">詢價狀態</label>
+                <select id="inquiryStatus" class="w-full p-2 border rounded bg-gray-50 focus:bg-white">
+                    <option value="waiting">等回覆 (Waiting)</option>
+                    <option value="replied">已回覆 (Replied)</option>
+                    <option value="price_high">價格高 (Price High)</option>
+                    <option value="no_stock">無供貨 (No Stock)</option>
+                    <option value="converted">已轉正式產品 (Converted)</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">詢價單備註</label>
+                <textarea id="inquiryNote" rows="2" class="w-full p-2 border rounded" placeholder="例如: 詢問是否有現貨、MOQ等..."></textarea>
+            </div>
+
+            <div class="bg-indigo-50 p-4 rounded mb-4">
+                <h3 class="font-bold text-indigo-800 mb-2 text-sm">新增詢價項目</h3>
+                <div class="grid grid-cols-12 gap-2 mb-2">
+                    <div class="col-span-5"><input type="text" id="inqItemName" placeholder="產品名稱" class="w-full p-1 border rounded text-sm"></div>
+                    <div class="col-span-5"><input type="text" id="inqItemSpec" placeholder="規格/型號" class="w-full p-1 border rounded text-sm"></div>
+                    <div class="col-span-2"><button onclick="addInquiryItemTemp()" class="w-full bg-indigo-600 text-white rounded text-sm py-1">加入</button></div>
+                </div>
+            </div>
+
+            <div class="max-h-60 overflow-y-auto border rounded mb-4">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-100 sticky top-0">
+                        <tr>
+                            <th class="p-2">產品名稱</th>
+                            <th class="p-2">規格</th>
+                            <th class="p-2 w-10">刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inquiryTempList">
+                        <!-- 暫存項目 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="saveSupplierInquiry()" class="flex-1 py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700">儲存詢價單</button>
+                <button onclick="closeModal('modal-create-inquiry')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded font-bold hover:bg-gray-300">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 快速新增供應商 (Nested) -->
+    <div id="modal-quick-add-supplier" class="modal-overlay nested">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4 border-t-4 border-green-500 shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 text-green-700">快速建立供應商</h2>
+            <form id="quickAddSupplierForm" class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium mb-1">供應商名稱 *</label>
+                    <input type="text" name="quickName" required class="w-full p-2 border rounded bg-gray-50 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">聯絡人</label>
+                    <input type="text" name="quickContact" class="w-full p-2 border rounded bg-gray-50 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">電話</label>
+                    <input type="text" name="quickPhone" class="w-full p-2 border rounded bg-gray-50 focus:bg-white">
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700">儲存並使用</button>
+                    <button type="button" onclick="closeModal('modal-quick-add-supplier')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded font-bold hover:bg-gray-300">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 供應商編輯 Modal -->
+    <div id="modal-edit-supplier" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-4xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-6 text-blue-700">修改供應商資料</h2>
+            <form id="editSupplierForm" class="space-y-6">
+                <input type="hidden" name="id">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">供應商編號</label>
+                    <input type="text" id="editSupplierCode" readonly class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                </div>
+
+                <!-- 基本資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        基本資訊
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">供應商名稱 *</label>
+                            <input type="text" name="name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">公司統編</label>
+                            <input type="text" name="taxId" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 聯絡資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        聯絡資訊
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">聯絡人</label>
+                            <input type="text" name="contact" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">聯絡人電話</label>
+                            <input type="text" name="phone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">公司電話</label>
+                            <input type="text" name="companyPhone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">網址</label>
+                            <input type="url" name="website" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="https://example.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 付款資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        付款資訊
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">付款方式</label>
+                            <select name="paymentType" onchange="toggleMonthlyDays(this, 'editMonthlyDaysWrapper')" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <option value="現金">現金</option>
+                                <option value="匯款">匯款</option>
+                                <option value="信用卡">信用卡</option>
+                                <option value="月結">月結</option>
+                            </select>
+                        </div>
+                        <div id="editMonthlyDaysWrapper" style="display:none;">
+                            <label class="block text-sm font-medium mb-1 text-gray-700">月結天數</label>
+                            <input type="number" name="monthlyDays" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="例如 30">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1 text-gray-700">匯款帳號</label>
+                            <input type="text" name="remittanceAccount" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="請輸入匯款帳號">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 其他資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        其他資訊
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">供貨地址</label>
+                            <input type="text" name="address" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-gray-700">備註</label>
+                            <textarea name="note" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical" placeholder="請輸入備註資訊"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="flex gap-4 pt-4 border-t border-gray-200">
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors">更新供應商資料</button>
+                    <button type="button" onclick="closeModal('modal-edit-supplier')" class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300 transition-colors">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 快速新增產品 Modal -->
+    <div id="modal-add-product-direct" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-4xl p-6 mx-4 border-t-4 border-green-500 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-6 text-green-700">新增產品</h2>
+            <form id="addProductDirectForm" class="space-y-5">
+                <input type="hidden" name="supplierId">
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-500">供應商</label>
+                    <input type="text" id="directSupplierName" readonly class="w-full p-3 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">產品名稱 *</label>
+                        <input type="text" name="prodName" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">品牌名稱</label>
+                        <input type="text" name="brandName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="例如: ABC 品牌">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">交期</label>
+                        <input type="text" name="deliveryTime" placeholder="例如: 3 或 3天 或 2週" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">規格</label>
+                        <input type="text" name="spec" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">產品網址 (供參考)</label>
+                        <input type="url" name="prodUrl" placeholder="https://" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">單價</label>
+                        <input type="number" name="price" step="0.01" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">稅務</label>
+                        <select name="isTaxIncl" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <option value="含稅">含稅</option>
+                            <option value="不含稅">不含稅</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">參考運費</label>
+                        <input type="number" name="shipping" value="0" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">產品備註</label>
+                    <textarea name="prodNote" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-vertical"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2 flex-col sm:flex-row">
+                    <button type="submit" class="flex-1 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors">新增產品</button>
+                    <button type="button" onclick="closeModal('modal-add-product-direct')" class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300 transition-colors">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 產品編輯 Modal -->
+    <div id="modal-edit-product" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-4xl p-6 mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">修改產品報價</h2>
+                        <p class="text-sm text-gray-500">更新產品資訊與報價資料</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-edit-product')" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 產品編號和時間戳顯示 -->
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 產品編號編輯 -->
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <span class="text-sm font-medium text-blue-700">產品編號</span>
+                        <span class="text-red-500">*</span>
+                    </div>
+                    <input type="text" id="editProductId" name="id" required
+                        class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors font-mono"
+                        placeholder="輸入產品編號">
+                    <div id="productIdError" class="text-red-500 text-xs mt-1 hidden">此編號已存在</div>
+                </div>
+
+                <!-- 建檔時間 -->
+                <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm font-medium text-green-700">建檔時間</span>
+                    </div>
+                    <div id="editProductCreatedAt" class="text-sm text-gray-600 font-mono">-</div>
+                </div>
+
+                <!-- 最後異動時間 -->
+                <div class="p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm font-medium text-orange-700">最後異動</span>
+                    </div>
+                    <div id="editProductUpdatedAt" class="text-sm text-gray-600 font-mono">-</div>
+                </div>
+            </div>
+
+            <form id="editProductForm" class="space-y-6">
+                <input type="hidden" name="id">
+
+                <!-- 基本資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">基本資訊</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                    對應供應商
+                                </span>
+                            </label>
+                            <input type="text" id="editSupplierSearchInput" list="editSupplierListForProduct" required
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                placeholder="輸入供應商名稱搜尋...">
+                            <input type="hidden" id="editSupplierId" name="supplierId" required>
+                            <datalist id="editSupplierListForProduct">
+                                <!-- 動態填入供應商選項 -->
+                            </datalist>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        產品名稱
+                                    </span>
+                                </label>
+                                <input type="text" name="prodName" required
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                                    placeholder="輸入產品名稱">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                        品牌名稱
+                                    </span>
+                                </label>
+                                <input type="text" name="brandName"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    placeholder="輸入品牌名稱 (選填)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 規格資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">規格資訊</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        交期
+                                    </span>
+                                </label>
+                                <input type="text" name="deliveryTime"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                    placeholder="例如: 3 或 3天 或 2週">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                        </svg>
+                                        規格
+                                    </span>
+                                </label>
+                                <input type="text" name="spec"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                    placeholder="輸入產品規格">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    </svg>
+                                    產品網址
+                                </span>
+                            </label>
+                            <input type="url" name="prodUrl"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                                placeholder="https:// (供參考)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 價格資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">價格資訊</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                    </svg>
+                                    單價
+                                </span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                                <input type="number" name="price" step="0.01"
+                                    class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                    </svg>
+                                    賣價
+                                </span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                                <input type="number" name="salesPrice" step="0.01"
+                                    class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                                    </svg>
+                                    稅務
+                                </span>
+                            </label>
+                            <select name="isTaxIncl"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors">
+                                <option value="含稅">含稅</option>
+                                <option value="不含稅">不含稅</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                    參考運費
+                                </span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                                <input type="number" name="shipping" step="0.01"
+                                    class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 其他資訊卡片 -->
+                <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">其他資訊</h3>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                產品備註
+                            </span>
+                        </label>
+                        <textarea name="prodNote" rows="3"
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors resize-vertical"
+                            placeholder="輸入產品相關備註資訊..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="flex gap-4 pt-4 border-t border-gray-200">
+                    <button type="submit" id="editProductSubmitBtn"
+                        class="flex-1 py-3 px-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-bold hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span id="editProductSubmitText">更新產品報價</span>
+                    </button>
+                    <button type="button" onclick="closeModal('modal-edit-product')"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300 transition-colors">
+                        取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 庫存批次檢視 Modal -->
+    <div id="modal-inventory-batches" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-3xl p-6 mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-blue-700">庫存批次追蹤</h2>
+                    <div class="text-sm text-gray-500">查看該庫存項目的批次與到貨記錄。</div>
+                </div>
+                <button onclick="closeModal('modal-inventory-batches')" class="text-gray-500 hover:text-gray-800">關閉</button>
+            </div>
+            <div id="inventoryBatchModalContent" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- 庫存盤點調整 Modal -->
+    <div id="modal-inventory-adjust" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-orange-700">庫存盤點調整</h2>
+                    <div class="text-sm text-gray-500">調整庫存數量，並留下調整備註。</div>
+                </div>
+                <button onclick="closeModal('modal-inventory-adjust')" class="text-gray-500 hover:text-gray-800">關閉</button>
+            </div>
+            <form id="inventoryAdjustForm" onsubmit="applyInventoryAdjustment(event)" class="space-y-4">
+                <input type="hidden" name="inventoryId">
+                <div id="inventoryAdjustLabel" class="text-sm text-gray-700"></div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">調整數量 (正數入庫、負數扣減)</label>
+                    <input id="inventoryAdjustmentQty" name="adjustmentDelta" type="number" class="w-full p-2 border rounded" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">備註</label>
+                    <textarea id="inventoryAdjustmentNote" name="adjustmentNote" rows="3" class="w-full p-2 border rounded"></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700">確認調整</button>
+                    <button type="button" onclick="closeModal('modal-inventory-adjust')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 庫存拆分包裝 Modal -->
+    <div id="modal-inventory-split" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-teal-700">拆分包裝</h2>
+                    <div class="text-sm text-gray-500">把大包裝或一箱拆成單一品進行販售。</div>
+                </div>
+                <button onclick="closeModal('modal-inventory-split')" class="text-gray-500 hover:text-gray-800">關閉</button>
+            </div>
+            <form id="inventorySplitForm" onsubmit="applyInventorySplit(event)" class="space-y-4">
+                <input type="hidden" name="inventoryId">
+                <div id="inventorySplitLabel" class="text-sm text-gray-700"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">拆分來源數量</label>
+                        <input id="inventorySplitFromQty" name="splitFromQty" type="number" min="1" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">拆分後產生數量</label>
+                        <input id="inventorySplitToQty" name="splitToQty" type="number" min="1" class="w-full p-2 border rounded" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">新規格名稱</label>
+                    <input id="inventorySplitSpec" name="splitNewSpec" type="text" class="w-full p-2 border rounded" placeholder="例如：單一品、單片包裝">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">稅務</label>
+                    <select id="inventorySplitTaxStatus" name="splitTaxStatus" class="w-full p-2 border rounded">
+                        <option value="含稅">含稅</option>
+                        <option value="不含稅">未稅 (+5%)</option>
+                        <option value="不計稅">不計稅 (收據)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">備註</label>
+                    <textarea id="inventorySplitNote" name="splitNote" rows="3" class="w-full p-2 border rounded"></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700">確認拆分</button>
+                    <button type="button" onclick="closeModal('modal-inventory-split')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 庫存出貨 Modal -->
+    <div id="modal-inventory-shipment" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-red-700">記錄出貨</h2>
+                    <div class="text-sm text-gray-500">從庫存扣除數量，並記錄售出金額、發票狀態與備註。</div>
+                </div>
+                <button onclick="closeModal('modal-inventory-shipment')" class="text-gray-500 hover:text-gray-800">關閉</button>
+            </div>
+            <form id="inventoryShipmentForm" onsubmit="applyInventoryShipment(event)" class="space-y-4">
+                <input type="hidden" name="inventoryId">
+                <input type="hidden" name="outboundId">
+                <div id="inventoryShipmentLabel" class="text-sm text-gray-700"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">可用數量</label>
+                        <input id="inventoryShipmentAvailable" type="text" class="w-full p-2 border rounded bg-gray-100" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">出貨數量</label>
+                        <input id="inventoryShipmentQty" name="shipmentQty" type="number" min="1" class="w-full p-2 border rounded" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">售出單價</label>
+                    <input id="inventoryShipmentPrice" name="shipmentPrice" type="number" step="0.01" class="w-full p-2 border rounded" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">發票狀態</label>
+                    <select id="inventoryShipmentInvoice" name="invoiceType" class="w-full p-2 border rounded">
+                        <option value="無發票">無發票</option>
+                        <option value="有發票">有發票</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">發票號碼</label>
+                        <input id="inventoryShipmentInvoiceNo" name="invoiceNo" type="text" class="w-full p-2 border rounded" placeholder="例如: 12345678">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">發票日期</label>
+                        <input id="inventoryShipmentInvoiceDate" name="invoiceDate" type="date" class="w-full p-2 border rounded">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">備註</label>
+                    <textarea id="inventoryShipmentNote" name="shipmentNote" rows="3" class="w-full p-2 border rounded"></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700">確認出貨</button>
+                    <button type="button" onclick="closeModal('modal-inventory-shipment')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 刪除庫存確認 Modal -->
+    <div id="modal-delete-inventory-confirm" class="modal-overlay">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4 border-t-4 border-red-600">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-red-700">確認刪除庫存</h2>
+                    <div class="text-sm text-gray-500">此操作無法復原，請仔細確認</div>
+                </div>
+                <button onclick="closeModal('modal-delete-inventory-confirm')" class="text-gray-500 hover:text-gray-800">✕</button>
+            </div>
+            
+            <div id="deleteInventoryConfirmLabel" class="text-base font-semibold text-gray-800 mb-6 p-3 bg-red-50 rounded border border-red-200"></div>
+            
+            <form onsubmit="event.preventDefault(); confirmDeleteInventoryItem();" class="space-y-4">
+                <input type="hidden" id="deleteInventoryConfirmId">
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3">
+                    <div class="text-sm text-yellow-800">
+                        <strong>⚠️ 安全驗證</strong><br>
+                        請輸入庫存編號以確認刪除操作：<br>
+                        <span id="deleteInventoryConfirmExpectedId" class="font-mono font-bold text-red-600"></span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">庫存編號</label>
+                    <input id="deleteInventoryConfirmInput" type="text" placeholder="輸入庫存編號..." class="w-full p-2 border-2 border-gray-300 rounded focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none font-mono">
+                </div>
+                
+                <div class="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    ✓ 將刪除此庫存項目及相關批次、異動記錄<br>
+                    ✓ 受影響的訂單將恢復可轉入狀態
+                </div>
+                
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2 bg-red-600 text-white rounded font-bold hover:bg-red-700">確認刪除</button>
+                    <button type="button" onclick="closeModal('modal-delete-inventory-confirm')" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded font-bold hover:bg-gray-300">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <footer class="mt-10 py-4 text-center text-sm text-gray-600 border-t border-gray-200">
+            開發者 <strong>SummerM</strong> 分享於
+            <a href="https://vocus.cc/article/69a12e9dfd89780001a61e98" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                https://vocus.cc/
+            </a>
+            ，歡迎使用訂閱來贊助我持續改進。
+        </footer>
+
+
+    <script src="data.js"></script>
+    <script src="utils.js"></script>
+    <script src="suppliers.js"></script>
+    <script src="products.js"></script>
+    <script src="quotes.js"></script>
+    <script src="inquiries.js"></script>
+    <script src="orders.js"></script>
+    <script src="inventory.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
