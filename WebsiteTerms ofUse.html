@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網站使用條款 - 東海國際有限公司 Tung Hai Int'l Corp.</title>
+    <meta name="description" content="歡迎閱讀東海國際有限公司（Tung Hai Int'l Corp.）網站使用條款。當您存取或使用本網站時，即表示您同意遵守本條款。本頁面說明了我們的網站內容、智慧財產權保護、使用者規範及免責聲明。">
+    <meta name="keywords" content="東海國際, 東海國際有限公司, 網站使用條款, 使用條款, 智慧財產權, 免責聲明, 法律條款">
+    <meta name="author" content="東海國際有限公司">
+    <link rel="canonical" href="https://example.com/terms-of-use">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="網站使用條款 - 東海國際有限公司">
+    <meta property="og:description" content="歡迎閱讀東海國際有限公司（Tung Hai Int'l Corp.）網站使用條款。當您存取或使用本網站時，即表示您同意遵守本條款。">
+    <meta property="og:url" content="https://example.com/terms-of-use">
+    <meta property="og:site_name" content="東海國際有限公司">
+
+    <!-- Tailwind CSS (用於快速與現代化的佈局美化) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc7fb',
+                            400: '#38a9f8',
+                            500: '#0e8ee9', // 東海藍主色
+                            600: '#0271c7',
+                            700: '#0359a1',
+                            800: '#074c85',
+                            900: '#0c406e',
+                        },
+                        neutral: {
+                            850: '#202020',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['PingFang TC', 'Heiti TC', 'Microsoft JhengHei', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 平滑滾動與列印樣式 */
+        html {
+            scroll-behavior: smooth;
+        }
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-card {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+
+    <!-- JSON-LD 結構化資料 (SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "網站使用條款 - 東海國際有限公司",
+      "description": "歡迎閱讀東海國際有限公司網站使用條款。當您存取或使用本網站時，即表示您同意遵守本條款。",
+      "publisher": {
+        "@type": "Organization",
+        "name": "東海國際有限公司",
+        "alternateName": "Tung Hai Int'l Corp.",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://example.com/logo.png"
+        },
+        "email": "tunghai12908823@gmail.com"
+      },
+      "dateModified": "2026-06-01"
+    }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-brand-50 to-white text-slate-700 min-h-screen flex flex-col antialiased">
+
+    <!-- 導覽列 -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-brand-100 shadow-sm no-print">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- 藍色幾何 Logo 示意 -->
+                <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-brand-200">
+                    東
+                </div>
+                <div>
+                    <span class="font-bold text-lg text-slate-800 tracking-wide block leading-none">東海國際有限公司</span>
+                    <span class="text-xs text-brand-600 font-medium tracking-wider">TUNG HAI INT'L CORP.</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                <a href="#" class="hover:text-brand-500 transition-colors">首頁</a>
+                <a href="#" class="hover:text-brand-500 transition-colors">產品介紹</a>
+                <a href="#" class="hover:text-brand-500 transition-colors">最新消息</a>
+                <a href="#" class="text-brand-500 border-b-2 border-brand-500 pb-1">使用條款</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.print()" class="text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center space-x-1 border border-brand-200 hover:border-brand-300 px-3 py-1.5 rounded-lg transition-all hover:bg-brand-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    <span>列印條款</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+        <article class="bg-white rounded-2xl shadow-xl shadow-brand-100/40 border border-brand-100/60 p-6 md:p-12 print-card">
+            
+            <!-- 標頭與前言 -->
+            <header class="border-b border-slate-100 pb-8 mb-8">
+                <div class="inline-flex items-center space-x-2 bg-brand-50 text-brand-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                    <span>官方條約</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight leading-tight">
+                    網站使用條款（Website Terms of Use）
+                </h1>
+                <div class="mt-4 flex flex-wrap items-center text-sm text-slate-500 gap-4">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        最後更新日期：2026 年 6 月 1 日
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        東海國際有限公司
+                    </span>
+                </div>
+                <div class="mt-8 text-base md:text-lg text-slate-600 leading-relaxed bg-slate-50/50 p-5 rounded-xl border border-slate-100">
+                    <p class="mb-3 font-medium">歡迎您瀏覽東海國際有限公司網站（以下簡稱「本網站」）。本網站由【東海國際有限公司】（以下簡稱「本公司」）營運及管理。</p>
+                    <p>當您存取、瀏覽或使用本網站時，即表示您已閱讀、瞭解並同意遵守本網站使用條款。如您不同意本條款之全部或部分內容，請停止使用本網站。</p>
+                </div>
+            </header>
+
+            <!-- 條款內容清單 -->
+            <div class="space-y-12">
+                
+                <!-- 一、網站內容與資訊 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">一、網站內容與資訊</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本網站所提供之公司資訊、產品介紹、服務內容、技術資料、案例展示及其他相關內容，僅供一般資訊參考之用。</p>
+                        <p>本公司將盡合理努力維持資訊之正確性與完整性，但不保證本網站所有內容於任何時間均為最新、完整或無誤。</p>
+                        <p>本公司保留隨時修改、更新、刪除或暫停本網站部分或全部內容之權利，恕不另行通知。</p>
+                    </div>
+                </section>
+
+                <!-- 二、智慧財產權 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">二、智慧財產權</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>除另有說明外，本網站所刊載之內容，包括但不限於：</p>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-brand-50/40 p-4 rounded-xl border border-brand-100/30 text-slate-700 font-medium">
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>文字內容</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>圖片及照片</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>圖示與圖表</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>公司標誌（Logo）</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>網頁設計與版面配置</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>影音資料</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>技術文件</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                                <span>其他相關內容</span>
+                            </li>
+                        </ul>
+                        <p>均受著作權法、商標法及其他智慧財產權相關法令保護，其權利屬本公司或合法權利人所有。</p>
+                        <p>未經本公司或權利人事前書面同意，任何人不得以任何形式：</p>
+                        <ul class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-4 rounded-xl text-slate-700 font-medium">
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>重製</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>修改</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>散布</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>公開傳輸</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>公開展示</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>發行</span>
+                            </li>
+                            <li class="col-span-2 flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>商業利用</span>
+                            </li>
+                        </ul>
+                        <p>本網站之全部或部分內容。</p>
+                    </div>
+                </section>
+
+                <!-- 三、圖片與第三方素材來源 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">三、圖片與第三方素材來源</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本網站部分圖片、照片及視覺素材可能來自合法授權之第三方素材平台或其授權創作者，並依相關授權條款使用。</p>
+                        <p>相關素材之著作權及其他智慧財產權仍歸原創作者或權利人所有。</p>
+                        <p>本網站所使用之第三方素材來源可能包括但不限於：</p>
+                        <div class="flex items-center space-x-2 bg-brand-50 w-fit px-4 py-2 rounded-lg border border-brand-100 mb-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-800"></span>
+                            <span class="font-semibold text-slate-800">Unsplash</span>
+                        </div>
+                        <p>本公司尊重智慧財產權。如您認為本網站之任何內容涉及侵權或權利問題，請與本公司聯繫，本公司將於確認後儘速處理。</p>
+                    </div>
+                </section>
+
+                <!-- 四、使用者行為規範 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">四、使用者行為規範</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>使用者於使用本網站時，同意遵守相關法令及網路使用規範，不得從事下列行為：</p>
+                        <ul class="space-y-2.5">
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>違反中華民國或適用地區之法律規定</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>侵害他人智慧財產權、隱私權或其他合法權益</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>散布不實、誤導、違法或有害資訊</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>嘗試未經授權存取網站系統、伺服器或資料庫</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>干擾網站正常運作或安全機制</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>散播病毒、惡意程式或其他有害程式碼</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xs font-bold mt-0.5">!</span>
+                                <span>從事可能損害本公司或第三方權益之行為</span>
+                            </li>
+                        </ul>
+                        <p class="bg-amber-50 text-amber-800 p-4 rounded-lg border border-amber-200 text-sm font-medium">
+                            若因違反本條款而造成任何損害，使用者應自行承擔相關法律責任。
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 五、聯絡表單與資訊提交 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">五、聯絡表單與資訊提交</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本網站可能提供聯絡表單供使用者進行業務洽詢、合作提案或其他聯繫用途。</p>
+                        <p>使用者應確保所提交之資訊為真實、正確且完整。</p>
+                        <p>本公司有權依實際業務需求決定是否回覆、處理或提供相關服務。</p>
+                        <p>透過本網站提交之個人資料，將依本網站《隱私權政策》進行蒐集、處理及利用。</p>
+                    </div>
+                </section>
+
+                <!-- 六、第三方服務與技術平台 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">六、第三方服務與技術平台</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>為提供穩定、安全及高效能之網站服務，本網站可能使用第三方技術服務，包括但不限於：</p>
+                        <ul class="space-y-2.5 my-3">
+                            <li class="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                                <div>
+                                    <span class="font-semibold text-slate-800 block">GitHub Pages</span>
+                                    <span class="text-xs text-slate-500">（網站託管服務）</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                                <div>
+                                    <span class="font-semibold text-slate-800 block">Cloudflare</span>
+                                    <span class="text-xs text-slate-500">（內容傳遞網路與網站安全服務）</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                                <div>
+                                    <span class="font-semibold text-slate-800 block">Web3Forms</span>
+                                    <span class="text-xs text-slate-500">（聯絡表單資料傳輸服務）</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <p>相關第三方服務可能依其自身服務條款及隱私政策處理技術性資訊或必要資料。</p>
+                    </div>
+                </section>
+
+                <!-- 七、外部網站連結 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 00-2 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">七、外部網站連結</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>本網站可能包含第三方網站、合作夥伴網站 or 外部平台之連結，以提供額外資訊或服務。</p>
+                        <p>使用者點擊外部連結後，即離開本網站範圍。</p>
+                        <p>本公司對於第三方網站之：</p>
+                        <ul class="grid grid-cols-2 md:grid-cols-3 gap-2 bg-slate-50 p-4 rounded-xl text-slate-700 font-medium">
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span>內容正確性</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span>隱私權保護措施</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span>網站安全性</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span>服務品質</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span>可用性</span>
+                            </li>
+                        </ul>
+                        <p>不負任何保證或責任。</p>
+                        <p>使用者應自行閱讀並遵守該第三方網站之相關規範。</p>
+                    </div>
+                </section>
+
+                <!-- 八、人才招募資訊 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">八、人才招募資訊</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本網站可能提供人才招募相關資訊，並連結至外部求職平台進行職缺管理及履歷投遞。</p>
+                        <p>當使用者前往第三方求職平台後，其個人資料之蒐集、處理及利用，將依該平台之服務條款及隱私政策辦理。</p>
+                        <p>本公司不直接透過本網站蒐集或保存求職者履歷資料，除非另有說明。</p>
+                    </div>
+                </section>
+
+                <!-- 九、免責聲明 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">九、免責聲明</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>本公司致力於維持網站內容之正確性與穩定性，但不保證：</p>
+                        <ul class="space-y-2 bg-slate-50 p-4 rounded-xl text-slate-700">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-slate-400 mt-0.5">•</span>
+                                <span>網站資訊完全正確或即時更新</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-slate-400 mt-0.5">•</span>
+                                <span>網站內容符合特定用途需求</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-slate-400 mt-0.5">•</span>
+                                <span>網站服務不中斷或不發生錯誤</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-slate-400 mt-0.5">•</span>
+                                <span>網站不存在病毒或其他有害程式</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-slate-400 mt-0.5">•</span>
+                                <span>網站缺陷將被即時修正</span>
+                            </li>
+                        </ul>
+                        <p>對於因使用、無法使用或依賴本網站資訊所產生之任何直接、間接、附帶或衍生性損害，本公司於法律允許範圍內不負賠償責任。</p>
+                    </div>
+                </section>
+
+                <!-- 十、網站維護與服務中斷 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">十、網站維護與服務中斷</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>本公司得因下列情況暫停或中斷網站全部或部分服務：</p>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>系統維護或更新</span>
+                            </li>
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>設備檢修</span>
+                            </li>
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>網路通訊異常</span>
+                            </li>
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>天災或不可抗力事件</span>
+                            </li>
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>資訊安全事件</span>
+                            </li>
+                            <li class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                                <span>其他必要情況</span>
+                            </li>
+                        </ul>
+                        <p>對於因此造成之不便或損失，本公司不負賠償責任。</p>
+                    </div>
+                </section>
+
+                <!-- 十一、條款修訂 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">十一、條款修訂</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本公司保留隨時修改本網站使用條款之權利。</p>
+                        <p>修訂後之內容將公布於本網站，自公告時起生效。</p>
+                        <p>使用者於條款修訂後繼續使用本網站，即視為同意接受修訂後之內容。</p>
+                    </div>
+                </section>
+
+                <!-- 十二、準據法與管轄法院 -->
+                <section class="scroll-mt-20">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">十二、準據法與管轄法院</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-3 leading-relaxed">
+                        <p>本條款之解釋、適用及因使用本網站所生之相關爭議，均依中華民國法律辦理。</p>
+                        <p>如因本網站或本條款產生任何爭議，雙方同意以臺灣臺中地方法院為第一審管轄法院。</p>
+                    </div>
+                </section>
+
+                <!-- 十三、聯絡資訊 -->
+                <section class="scroll-mt-20 border-t border-slate-100 pt-8">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center shadow-md shadow-brand-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">十三、聯絡資訊</h2>
+                    </div>
+                    <div class="pl-11 text-slate-600 space-y-4 leading-relaxed">
+                        <p>如您對本網站使用條款有任何疑問，歡迎與我們聯繫：</p>
+                        <div class="bg-brand-50/60 rounded-xl p-6 border border-brand-100/60 max-w-xl">
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-xs font-semibold text-brand-600 tracking-wider bg-brand-100 px-2 py-0.5 rounded">公司名稱</span>
+                                    <span class="text-slate-800 font-bold">東海國際有限公司 Tung Hai Int'l Corp.</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-xs font-semibold text-brand-600 tracking-wider bg-brand-100 px-2 py-0.5 rounded">聯絡信箱</span>
+                                    <a href="mailto:tunghai12908823@gmail.com" class="text-brand-600 hover:text-brand-700 font-medium underline transition-colors">
+                                        tunghai12908823@gmail.com
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-50 border-t border-slate-200/60 py-8 no-print">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-slate-500">
+                &copy; 2026 東海國際有限公司 Tung Hai Int'l Corp. 版權所有。
+            </p>
+            <div class="mt-3 flex justify-center space-x-4 text-xs text-slate-400">
+                <a href="#" class="hover:text-brand-500 transition-colors">隱私權政策</a>
+                <span>&middot;</span>
+                <a href="#" class="hover:text-brand-500 transition-colors">網站使用條款</a>
+                <span>&middot;</span>
+                <a href="#" class="hover:text-brand-500 transition-colors">免責聲明</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
